@@ -134,7 +134,8 @@
         this.controls = new CameraControls(this.camera, this.renderer.domElement);
         this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
         this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE;
-        this.controls.dollySpeed = 0.3;
+        this.controls.mouseButtons.wheel= CameraControls.ACTION.ZOOM;
+        // this.controls.dollySpeed = 0.3;
         // let height = 10
         this.controls.setTarget(midX, midY, 0)
         // this.controls.moveTo(midX, midY, height)
@@ -197,7 +198,7 @@
           header: true,
           step: function (row) {
             // debugger
-            if (row.data.Total < 40) {
+            if (row.data.Total < 20) {
               // console.log('returning early')
               return;
             } else {
