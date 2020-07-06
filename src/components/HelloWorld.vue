@@ -147,7 +147,7 @@
           header: true,
           step: function (row) {
             // debugger
-            if (row.data.Total < 50) {
+            if (row.data.Total < 40) {
               // console.log('returning early')
               return;
             } else {
@@ -179,7 +179,7 @@
             // }
 
             // console.log("plotting row data", row.data)
-            let geometry = new Three.TorusGeometry(hy/2, row.data.Total / 5000, 16, 20, Math.PI);
+            let geometry = new Three.TorusBufferGeometry(hy/2, row.data.Total / 5000, 16, 20, Math.PI);
             geometry.rotateX(Math.PI / 2)
 
             // let mesh = new Three.Mesh(geometry.scale(0.5, 0.5, 0.5), material);
