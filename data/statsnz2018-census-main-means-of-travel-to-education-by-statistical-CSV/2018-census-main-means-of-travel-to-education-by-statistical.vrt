@@ -1,0 +1,25 @@
+<OGRVRTDataSource>
+  <OGRVRTLayer name="2018-census-main-means-of-travel-to-education-by-statistical">
+    <SrcDataSource relativeToVRT="1">2018-census-main-means-of-travel-to-education-by-statistical.csv</SrcDataSource>
+    <FeatureCount>22430</FeatureCount>
+    <Field name="SA2_code_usual_residence_address" src="SA2_code_usual_residence_address" type="Integer" />
+    <Field name="SA2_name_usual_residence_address" src="SA2_name_usual_residence_address" type="String" width="8000" />
+    <Field name="SA2_usual_residence_easting" src="SA2_usual_residence_easting" type="Real" />
+    <Field name="SA2_usual_residence_northing" src="SA2_usual_residence_northing" type="Real" />
+    <Field name="SA2_code_educational_address" src="SA2_code_educational_address" type="Integer" />
+    <Field name="SA2_name_educational_address" src="SA2_name_educational_address" type="String" width="8000" />
+    <Field name="SA2_educational_easting" src="SA2_educational_easting" type="Real" />
+    <Field name="SA2_educational_northing" src="SA2_educational_northing" type="Real" />
+    <Field name="Study_at_home" src="Study_at_home" type="Integer" />
+    <Field name="Drive_a_car_truck_or_van" src="Drive_a_car_truck_or_van" type="Integer" />
+    <Field name="Passenger_in_a_car_truck_or_van" src="Passenger_in_a_car_truck_or_van" type="Integer" />
+    <Field name="Train" src="Train" type="Integer" />
+    <Field name="Bicycle" src="Bicycle" type="Integer" />
+    <Field name="Walk_or_jog" src="Walk_or_jog" type="Integer" />
+    <Field name="School_bus" src="School_bus" type="Integer" />
+    <Field name="Public_bus" src="Public_bus" type="Integer" />
+    <Field name="Ferry" src="Ferry" type="Integer" />
+    <Field name="Other" src="Other" type="Integer" />
+    <Field name="Total" src="Total" type="Integer" />
+  </OGRVRTLayer>
+</OGRVRTDataSource>
