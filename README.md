@@ -1,2 +1,2 @@
 # statsnz
-Statsnz visualiation competition 2020
+Statsnz visualisation competition 2020
