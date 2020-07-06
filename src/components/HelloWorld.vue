@@ -60,6 +60,7 @@
         controls: null,
         renderer: null,
         mesh: null,
+        hoops: null,
         hasEverRendered: null,
         minNorthing: null,
         maxNorthing: null,
@@ -111,6 +112,8 @@
         );
         this.scene.add( mesh );
 
+        this.hoops = [];
+
 
         this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer.setSize(container.clientWidth, container.clientHeight);
@@ -153,6 +156,10 @@
 
         requestAnimationFrame(this.animate);
 
+        // for(let hoop of this.hoops) {
+        //   hoop.geometry.rotateY(delta)
+        // }
+
         // console.log("hasever: ", this.hasEverRendered)
         // let p;
         // let position = this.controls.getPosition({});
@@ -180,6 +187,10 @@
         let material = new Three.MeshBasicMaterial({color: 0xffff00});
 
         let self = this
+
+        self.hoops = new Array;
+
+        let mergedGeometry = new Three.Geometry;
 
         papa.parse('/education.csv', {
           download: true,
@@ -218,7 +229,9 @@
             // }
 
             // console.log("plotting row data", row.data)
-            let geometry = new Three.TorusBufferGeometry(hy/2, row.data.Total / 5000, 16, 20, Math.PI);
+            // let geometry = new Three.TorusBufferGeometry(hy/2, row.data.Total / 5000, 8, 10, Math.PI);
+            let geometry = new Three.TorusGeometry(hy/2, row.data.Total / 5000, 8, 10, Math.PI);
+            // geometry = new Three.WireframeGeometry(geometry)
             geometry.rotateX(Math.PI / 2)
 
             // let mesh = new Three.Mesh(geometry.scale(0.5, 0.5, 0.5), material);
@@ -231,10 +244,15 @@
             mesh.position.y = midpoint.y
             mesh.position.z = 0;
 
-            self.scene.add(mesh);
+            mergedGeometry.mergeMesh(mesh);
+
+            self.hoops.push(mesh);
+            // self.scene.add(mesh);
           },
           complete: function() {
-            this.renderer.render(this.scene, this.camera);
+
+            self.scene.add(new Three.Mesh(mergedGeometry, material));
+            // this.renderer.render(this.scene, this.camera);
           }
         });
 
