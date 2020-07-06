@@ -11,6 +11,36 @@
   import CameraControls from 'camera-controls';
   import axios from 'axios'
   import * as papa from 'papaparse'
+  import * as d3 from "d3";
+  import * as topojson from 'topojson-client'
+
+
+  let THREE = Three;
+
+  // https://gist.github.com/mbostock/2b85250396c17a79155302f91ec21224
+  // Converts a point [longitude, latitude] in degrees to a THREE.Vector3.
+  function vertex(point) {
+    // var lambda = point[0] * Math.PI / 180,
+    //   phi = point[1] * Math.PI / 180,
+    //   cosPhi = Math.cos(phi);
+    return new THREE.Vector3(
+      point[0]/ 10000, point[1] / 10000, 0
+    );
+  }
+
+  // https://gist.github.com/mbostock/2b85250396c17a79155302f91ec21224
+  // Converts a GeoJSON MultiLineString in spherical coordinates to a THREE.LineSegments.
+  function wireframe(multilinestring, material) {
+    var geometry = new THREE.Geometry;
+    multilinestring.coordinates.forEach(function(line) {
+      // debugger
+      d3.pairs(line.map(vertex), function(a, b) {
+      // d3.pairs(line, function(a, b) {
+        geometry.vertices.push(a , b );
+      });
+    });
+    return new THREE.LineSegments(geometry, material);
+  }
 
   CameraControls.install({THREE: Three});
   // import educationData from "../assets/education.csv";
@@ -42,6 +72,7 @@
     },
     created() {
       this.getEducationData()
+      this.getMapData()
     },
     methods: {
       init: function () {
@@ -133,6 +164,14 @@
           // this.hasEverRendered = true;
         // }
       },
+      getMapData() {
+        axios.get("/nz_topojson_simplified.json").then(response => {
+          console.log("got topojson")
+          let topology=response.data
+          let mesh = wireframe(topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"]), new THREE.LineBasicMaterial({color: '#223627'}));
+          this.scene.add(mesh)
+        })
+      },
       getEducationData() {
         this.isLoading = true
 
@@ -185,18 +224,6 @@
             // let mesh = new Three.Mesh(geometry.scale(0.5, 0.5, 0.5), material);
             let mesh = new Three.Mesh(geometry, material);
 
-            // mesh.position.x = Math.random() * 500;
-            // mesh.scale(0.5, 0.5, 0.5);
-            // mesh.position.y = minNorthing + (maxNorthing - minNorthing) * Math.random();
-            //   mesh.position.y = Math.random() * 100
-            // debugger;
-            // console.log("setting mesh position: ", mesh.position.x, mesh.position.y, mesh.position.z)
-
-            // console.log("adding coord at x, y", mesh.position.x, mesh.position.y)
-            // mesh.position.y = 4700 + 800 * Math.random();
-            // mesh.position.z = Math.random() * 100
-            // mesh.rotateX(Math.random() * 3);
-
             // mesh.scale.set(scale, scale, scale);
             mesh.rotateZ(theta)
 
@@ -205,26 +232,12 @@
             mesh.position.z = 0;
 
             self.scene.add(mesh);
-            // complete: function(results) {
-            //   console.log(results);
-            // }
-
           },
           complete: function() {
             this.renderer.render(this.scene, this.camera);
           }
         });
 
-
-        //   response.data, {relax: true}, function (data) {
-        //   console.log("data")
-        //   // return data.map(function (value) {
-        //   //   return value.toUpperCase()
-        //   // });
-        // }, function (err, data) {
-        //   console.log("error downloading data")
-        // });
-        // });
       }
       // import("../assets/education.csv").then(data => {
       //   debugger;
