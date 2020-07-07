@@ -1,5 +1,9 @@
 <template>
-    <div id="map-container" style="height:600px"></div>
+    <div>
+        <div id="map-container" style="height:600px"></div>
+        <p> Dataset: {{appState.dataset}}</p>
+
+    </div>
 </template>
 
 <script>
@@ -13,6 +17,8 @@
   import * as papa from 'papaparse'
   import * as d3 from "d3";
   import * as topojson from 'topojson-client'
+
+  import appState from '@/components/AppState'
 
 
   let THREE = Three;
@@ -49,9 +55,16 @@
     name: 'ThreeTest',
     data() {
       return {
-        isLoading: false
+        isLoading: false,
+        appState: appState
       }
     },
+    // computed() {
+    //   selectedDataset: function() {
+    //     return "poop"
+    //
+    //   }
+    // },
     static() {
       return {
         clock: null,

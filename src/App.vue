@@ -25,9 +25,16 @@
   import MapView from './components/MapView.vue'
   import Controls from './components/Controls.vue'
 
+  import AppState from './components/AppState.js'
+
   // Import our custom scss file
   import './custom.scss'
 
+
+  // import Vue from 'vue'
+  // let appState = new Vue({
+  //   data: AppState
+  // })
 
   export default {
     name: 'App',
