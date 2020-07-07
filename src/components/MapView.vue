@@ -1,6 +1,5 @@
 <template>
     <div id="map-container" style="height:600px"></div>
-    <!--<div id="container"></div>-->
 </template>
 
 <script>

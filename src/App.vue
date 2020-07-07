@@ -13,7 +13,7 @@
                     </div>
                 </b-col>
                 <b-col cols="12" md="3">
-                    Controls
+                    <Controls></Controls>
                 </b-col>
             </b-row>
         </b-container>
@@ -23,6 +23,7 @@
 
 <script>
   import MapView from './components/MapView.vue'
+  import Controls from './components/Controls.vue'
 
   // Import our custom scss file
   import './custom.scss'
@@ -31,7 +32,7 @@
   export default {
     name: 'App',
     components: {
-      MapView
+      MapView, Controls
     }
   }
 </script>
