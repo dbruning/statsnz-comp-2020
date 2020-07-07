@@ -1,18 +1,27 @@
 <template>
   <div id="app">
+    <b-container>
+      <b-row>
+        <b-col cols="12" md="9">
+          <MapView/>
+        </b-col>
+          <b-col cols="12" md="3">
+            Controls
+          </b-col>
+      </b-row>
+    </b-container>
     <!--<img alt="Vue logo" src="./assets/logo.png">-->
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import MapView from './components/MapView.vue'
 
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    MapView
   }
 }
 </script>

@@ -198,7 +198,7 @@
           header: true,
           step: function (row) {
             // debugger
-            if (row.data.Total < 20) {
+            if (row.data.Total < 200) {
               // console.log('returning early')
               return;
             } else {
