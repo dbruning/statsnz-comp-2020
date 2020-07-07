@@ -1,5 +1,6 @@
 <template>
-    <div id="container" style="width:600px;height:600px"></div>
+    <div id="map-container" style="height:600px"></div>
+    <!--<div id="container"></div>-->
 </template>
 
 <script>
@@ -68,7 +69,6 @@
         minEasting: null,
         maxEasting: null,
         midEasting: null,
-
       }
     },
     created() {
@@ -77,7 +77,7 @@
     },
     methods: {
       init: function () {
-        let container = document.getElementById('container');
+        let container = document.getElementById('map-container');
 
         this.minNorthing = 470;
         this.maxNorthing = 620;
@@ -283,4 +283,8 @@
 </script>
 
 <style scoped>
+    .map-container {
+        margin: 1em;
+    }
+
 </style>
