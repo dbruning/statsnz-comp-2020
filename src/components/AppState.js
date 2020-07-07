@@ -1,7 +1,8 @@
 import Vue from 'vue'
 
 var sharedState = {
-    dataset: "work"
+    dataset: "work",
+    detail: "coarse"
 }
 
 var tmpVm = new Vue({ data : { sharedState} });

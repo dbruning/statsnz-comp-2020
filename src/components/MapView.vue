@@ -84,7 +84,7 @@
       }
     },
     created() {
-      // this.getEducationData()
+      // this.getVisualisationData()
       this.getMapData()
     },
     methods: {
@@ -188,11 +188,12 @@
         axios.get("/nz_topojson_simplified.json").then(response => {
           console.log("got topojson")
           let topology=response.data
-          let mesh = wireframe(topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"]), new THREE.LineBasicMaterial({color: '#223627'}));
+          let mesh = wireframe(topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"]),
+            new THREE.LineBasicMaterial({color: '#4d966b'}));
           this.scene.add(mesh)
         })
       },
-      getEducationData() {
+      getVisualisationData() {
         this.isLoading = true
 
         // let geometry = new Three.TorusGeometry(10, 1, 16, 20);
@@ -206,26 +207,27 @@
         let mergedGeometry = new Three.Geometry;
 
         let countMerged = 0;
-        papa.parse('/education.csv', {
+        // papa.parse('/education.csv', {
+
+        let csv = (this.appState.dataset == 'work') ? '/work.csv' : '/education.csv'
+        let toEastingField = (this.appState.dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting';
+        let toNorthingField = (this.appState.dataset == 'work') ? 'SA2_workplace_northing' : 'SA2_educational_northing';
+        papa.parse(csv, {
           download: true,
           header: true,
-          // worker: true,
           step: function (row, parser) {
-            // debugger
-            // if (row.data.Total < 20) {
-            //   // console.log('returning early')
-            //   return;
-            // } else {
-            //   // console.log("not returning: " + row.data.total)
-            // }
-
+            if (row.data.Total < 50) {
+              return;
+            }
             let from = {
               x: row.data.SA2_usual_residence_easting / 10000,
               y: row.data.SA2_usual_residence_northing / 10000
             }
             let to = {
-              x: row.data.SA2_educational_easting / 10000,
-              y: row.data.SA2_educational_northing / 10000
+              x: row.data[toEastingField] / 10000,
+              y: row.data[toNorthingField] / 10000
+              // x: row.data.SA2_educational_easting / 10000,
+              // y: row.data.SA2_educational_northing / 10000
             }
             let midpoint = {
               x: (from.x + to.x) / 2,
@@ -260,8 +262,7 @@
             mesh.position.z = 0;
 
             mergedGeometry.mergeMesh(mesh);
-            if (countMerged++ > 500) {
-              console.log("Adding merged mesh")
+            if (countMerged++ > 300) {
               self.scene.add(new Three.Mesh(mergedGeometry, material));
               mergedGeometry = new Three.Geometry;
               countMerged = 0;
@@ -306,7 +307,7 @@
     mounted() {
       this.init();
       this.animate();
-      this.getEducationData()
+      this.getVisualisationData()
       // this.getMapData()
 
     },
