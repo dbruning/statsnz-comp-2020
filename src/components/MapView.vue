@@ -73,7 +73,7 @@
         controls: null,
         renderer: null,
         mesh: null,
-        hoops: null,
+        chunks: null,
         hasEverRendered: null,
         minNorthing: null,
         maxNorthing: null,
@@ -84,7 +84,7 @@
       }
     },
     created() {
-      this.getEducationData()
+      // this.getEducationData()
       this.getMapData()
     },
     methods: {
@@ -124,7 +124,7 @@
         );
         this.scene.add( mesh );
 
-        this.hoops = [];
+        this.chunks = [];
 
 
         this.renderer = new Three.WebGLRenderer({antialias: true});
@@ -201,21 +201,23 @@
 
         let self = this
 
-        self.hoops = new Array;
+        self.chunks = new Array;
 
         let mergedGeometry = new Three.Geometry;
 
+        let countMerged = 0;
         papa.parse('/education.csv', {
           download: true,
           header: true,
-          step: function (row) {
+          // worker: true,
+          step: function (row, parser) {
             // debugger
-            if (row.data.Total < 200) {
-              // console.log('returning early')
-              return;
-            } else {
-              // console.log("not returning: " + row.data.total)
-            }
+            // if (row.data.Total < 20) {
+            //   // console.log('returning early')
+            //   return;
+            // } else {
+            //   // console.log("not returning: " + row.data.total)
+            // }
 
             let from = {
               x: row.data.SA2_usual_residence_easting / 10000,
@@ -258,9 +260,24 @@
             mesh.position.z = 0;
 
             mergedGeometry.mergeMesh(mesh);
+            if (countMerged++ > 500) {
+              console.log("Adding merged mesh")
+              self.scene.add(new Three.Mesh(mergedGeometry, material));
+              mergedGeometry = new Three.Geometry;
+              countMerged = 0;
 
-            self.hoops.push(mesh);
+              if (!parser.paused()) {
+                parser.pause()
+              }
+              setTimeout(function() {
+                // results = null
+                if (parser.paused())
+                  parser.resume()
+                }, 100)
+            }
+
             // self.scene.add(mesh);
+            // self.scene.add(new Three.Mesh(mergedGeometry, material));
           },
           complete: function() {
 
@@ -289,6 +306,8 @@
     mounted() {
       this.init();
       this.animate();
+      this.getEducationData()
+      // this.getMapData()
 
     },
   }
