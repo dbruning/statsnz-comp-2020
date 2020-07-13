@@ -1,5 +1,5 @@
 import * as Three from "three";
-import {nzgdToVector2} from "./nz";
+import {eastingToMap, northingToMap, nzgdToVector2} from "./nz";
 import * as topojson from "topojson-client";
 
 let THREE = Three
@@ -36,7 +36,21 @@ export function makePolygons(topoJsonData) {
     let holes = [];
     if (feature.geometry.type == "Polygon") {
       parts.push(feature.geometry.coordinates[0]);
+
+      if (feature.geometry.coordinates.length > 1) {
+        holes = feature.geometry.coordinates.slice(1)
+        // holes.push(feature.geometry.coordinates[1])
+      }
     } else if (feature.geometry.type == "MultiPolygon") {
+      // for(let multiPart of feature.geometry){
+      //   parts.push(multiPart.coordinates[0]);
+      //
+      //   if (multiPart.coordinates.length > 1) {
+      //     holes = multiPart.coordinates.slice(1)
+      //     // holes.push(feature.geometry.coordinates[1])
+      //   }
+      //
+      // }
       parts = feature.geometry.coordinates[0];
       // console.log("unknown: " + feature.geometry.type)
     }
@@ -78,6 +92,22 @@ export function makePolygons(topoJsonData) {
       const shape = new THREE.Shape(points);
 
       // console.log("shape", shape)
+
+      for(let hole of holes) {
+        // const hole = coordinate[1];
+        // if (hole) {
+          const path = new THREE.Path();
+          for (let i = 0; i < hole.length; i++) {
+            const point = hole[i];
+            if (i === 0) {
+              path.moveTo(eastingToMap(point[0]), northingToMap(point[1])) ;
+            } else {
+              path.lineTo(eastingToMap(point[0]), northingToMap(point[1])) ;
+            }
+          }
+          shape.holes.push(path);
+        }
+      // }
 
       // hole
       // const hole = coordinate[1];

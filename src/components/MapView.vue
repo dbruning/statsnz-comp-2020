@@ -81,7 +81,7 @@
         container.addEventListener("click", (event) => {
           let rect = container.getBoundingClientRect();
 
-          container.setAttribute("style", "border: 1px solid red")
+          // container.setAttribute("style", "border: 1px solid red")
 
           // console.log("click: ", event)
           let mouse3D = new THREE.Vector3(
@@ -164,9 +164,9 @@
 
 
           this.areaPolygons = makePolygons(response.data)
-          for(let p of this.areaPolygons) {
-            this.scene.add(p)
-          }
+          // for(let p of this.areaPolygons) {
+          //   this.scene.add(p)
+          // }
 
           addMapEdgesToScene(response.data, this.scene)
 
@@ -175,7 +175,16 @@
       getVisualisationData() {
         this.isLoading = true
 
-        let material = new Three.MeshBasicMaterial({color: 0xffff00});
+        // let material = new Three.MeshBasicMaterial({color: 0xffff00});
+        let material = new Three.MeshPhongMaterial({color: 0xffff00});
+        // let material = new Three.MeshNormalMaterial({color: 0xffff00});
+
+        var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+        this.scene.add( ambientLight );
+
+        let light = new THREE.DirectionalLight( 0xffffff );
+        light.position.set( 0, 1, 1 ).normalize();
+        this.scene.add(light);
 
         let self = this
 
