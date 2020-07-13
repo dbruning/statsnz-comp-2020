@@ -14,6 +14,7 @@
                 </b-col>
                 <b-col cols="12" md="3" class="control-column">
                     <Controls></Controls>
+                    <RegionDetail></RegionDetail>
                     <PerfStats></PerfStats>
                 </b-col>
             </b-row>
@@ -31,6 +32,7 @@
 
   // Import our custom scss file
   import './custom.scss'
+  import RegionDetail from "./components/RegionDetail";
 
 
   // import Vue from 'vue'
@@ -41,7 +43,7 @@
   export default {
     name: 'App',
     components: {
-      MapView, Controls, PerfStats
+      MapView, Controls, PerfStats, RegionDetail
     }
   }
 </script>
