@@ -78,28 +78,31 @@
         container.appendChild(this.renderer.domElement);
 
         container.addEventListener("click", (event) => {
-          console.log("click: ", event)
-          let mouse3D = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1,
-            -( event.clientY / window.innerHeight ) * 2 + 1,
-            0.5 );
+          let rect = container.getBoundingClientRect();
+
+          container.setAttribute("style", "border: 1px solid red")
+
+          // console.log("click: ", event)
+          let mouse3D = new THREE.Vector3(
+            ( ( event.clientX - rect.left ) / ( rect.right - rect.left ) ) * 2 - 1,
+            - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
+            0.1 );
+
           let raycaster =  new THREE.Raycaster();
           raycaster.setFromCamera( mouse3D, self.camera );
 
-          console.log("areaPolygons", self.areaPolygons);
+          // console.log("areaPolygons", self.areaPolygons);
           let intersects = raycaster.intersectObjects( self.areaPolygons);
-          console.log(intersects)
+          if (intersects.length) {
+            var mesh = intersects[0]
+            console.log("clicked on:", mesh.object.userData.SA22018__1)
+            // mesh.object.visible = false;
+            // debugger
+            // mesh.material.color.set("blue")
+          }
 
         }, false);
 
-        // function onClick(event) {
-        //   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        //   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        //   raycaster.setFromCamera(mouse, camera);
-        //   intersects = raycaster.intersectObject(mesh);
-        //   if (intersects.length > 0) {
-        //     console.log('ok');
-        //   }
-        // }
 
         // let midX = 170
         // let midY = 550
@@ -158,9 +161,13 @@
           // let topology = response.data
           // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
 
-          addMapEdgesToScene(response.data, this.scene)
 
           this.areaPolygons = makePolygons(response.data)
+          // for(let p of this.areaPolygons) {
+          //   this.scene.add(p)
+          // }
+
+          addMapEdgesToScene(response.data, this.scene)
 
           // // https://github.com/topojson/topojson-client
           // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])

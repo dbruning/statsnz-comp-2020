@@ -80,6 +80,7 @@ export function makePolygons(topoJsonData) {
     let material = new Three.MeshBasicMaterial({color: 0xffff00});
     let mesh = new THREE.Mesh(geometry, material)
 
+    mesh.userData = feature.properties;
     result.push(mesh)
 
   }
