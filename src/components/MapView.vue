@@ -14,7 +14,7 @@
   import { makePolygons} from "./mapPolygonsLayer";
   import {addMapEdgesToScene} from "./mapEdgesLayer";
   import {MapControls} from "three/examples/jsm/controls/OrbitControls";
-  import {addVisualisationData} from "./visualisationLayer";
+  import {addVisualisationData, getRegionData} from "./visualisationLayer";
   import {detectClicks} from "./clickDetector";
 
   let THREE = Three;
@@ -144,6 +144,15 @@
 
         // Add new visualisation data
         self.visualisationData = addVisualisationData(self.scene, self.appState)
+      })
+
+
+      this.$root.$on('regionClicked', function(data) {
+        // self.regionName = data.SA22018__1
+        let regionData = getRegionData(data.SA22018__1, appState)
+
+        // console.log("Region clicked:", data)
+
       })
 
     },

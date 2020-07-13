@@ -4,9 +4,13 @@ import {eastingToMap, northingToMap} from "./nz";
 
 let THREE = Three
 
-
-export function getRegionData(regionName) {
-
+function getSettingsForDataset(dataset) {
+  return {
+    csv: (dataset == 'work') ? '/work.csv' : '/education.csv',
+    toEastingField: (dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting',
+    toNorthingField: (dataset == 'work') ? 'SA2_workplace_northing' : 'SA2_educational_northing',
+    toNameField: (dataset == 'work') ? 'SA2_name_workplace_address' : 'SA2_name_educational_address'
+  }
 }
 
 export function addVisualisationData(scene, appState) {
@@ -18,9 +22,7 @@ export function addVisualisationData(scene, appState) {
 
   let countMerged = 0;
 
-  let csv = (appState.dataset == 'work') ? '/work.csv' : '/education.csv'
-  let toEastingField = (appState.dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting';
-  let toNorthingField = (appState.dataset == 'work') ? 'SA2_workplace_northing' : 'SA2_educational_northing';
+  let {csv, toEastingField, toNorthingField} = getSettingsForDataset(appState.dataset)
 
   let ignoreBelowTotal = 50;
   if (appState.dataDetail == "low") {
@@ -57,7 +59,6 @@ export function addVisualisationData(scene, appState) {
       if (row.data.Total < ignoreBelowTotal) {
         return;
       }
-
 
       // Figure out the geometry of the hop for this row
       let hopMesh = getHopGeometry(row, toEastingField, toNorthingField, material)
@@ -98,6 +99,46 @@ export function addVisualisationData(scene, appState) {
   });
 
   return result;
+}
+
+export function getRegionData(regionName, appState) {
+  debugger
+  console.log("Getting region data for region name:", regionName)
+
+  let result = []
+
+  let material = new Three.MeshPhongMaterial({color: 0xffff00});
+  let mergedGeometry = new Three.Geometry;
+  let countMerged = 0;
+
+  let {csv, toEastingField, toNorthingField, toNameField} = getSettingsForDataset(appState.dataset)
+
+  papa.parse(csv, {
+    download: true,
+    header: true,
+    step: function (row, parser) {
+
+      if (row.data.SA2_name_usual_residence_address == regionName) {
+        result.push({to: row.data[toNameField], count: row.data.Total})
+
+      } else if (row.data[toNameField] == regionName) {
+        result.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
+      }
+    },
+    complete: function () {
+
+      console.log(result)
+      // // Add the final mesh to the scene & results
+      // let mesh = new Three.Mesh(mergedGeometry, material);
+      // scene.add(mesh);
+      // result.push(mesh)
+      //
+      // appState.progressTask = ""
+    }
+  });
+
+  return result;
+
 }
 
 function getHopGeometry(row, toEastingField, toNorthingField, material) {

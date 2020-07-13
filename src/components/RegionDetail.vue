@@ -8,10 +8,6 @@
 <script>
   import appState from '@/components/AppState'
 
-  // appState.progressTask = "testing"
-  // appState.progressPercent= 5
-
-
   export default {
     name: 'Controls',
     data() {
@@ -29,11 +25,11 @@
     },
     mounted() {
       let self = this;
-      this.$root.$on('regionClicked', function(data) {
-        self.regionName = data.SA22018__1
-        console.log("Region clicked:", data)
-
-      })
+      // this.$root.$on('regionClicked', function(data) {
+      //   self.regionName = data.SA22018__1
+      //   console.log("Region clicked:", data)
+      //
+      // })
     },
   }
 </script>
