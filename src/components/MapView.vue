@@ -11,16 +11,13 @@
   import * as papa from 'papaparse'
 
   import appState from '@/components/AppState'
-  import {featuresToGeometry, makePolygons} from "./mapPolygonsLayer";
-  import {eastingToMap, northingToMap} from "./nz";
+  import { makePolygons} from "./mapPolygonsLayer";
   import {addMapEdgesToScene} from "./mapEdgesLayer";
-  import * as topojson from "topojson-client";
   import {MapControls} from "three/examples/jsm/controls/OrbitControls";
   import {addVisualisationData} from "./visualisationLayer";
+  import {detectClicks} from "./clickDetector";
 
   let THREE = Three;
-
-  // CameraControls.install({THREE: Three});
 
   export default {
     name: 'ThreeTest',
@@ -67,86 +64,10 @@
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(this.renderer.domElement);
 
-        // container.addEventListener("mousedown", (event) => {
-        //   console.log("mousedown event", event)
-        // })
-        //
-        // container.addEventListener("mouseup", (event) => {
-        //   console.log("mouseup event", event)
-        // })
-        //
-        // container.addEventListener("mousemove", (event) => {
-        //   console.log("mouseup event", event)
-        // })
-
-
-        // https://stackoverflow.com/a/59741870/84898
-        const clickDelta = 6;
-        let startClickX;
-        let startClickY;
-
-        container.addEventListener('mousedown', function (event) {
-          startClickX = event.pageX;
-          startClickY = event.pageY;
-        });
-
-        container.addEventListener('mouseup', function (event) {
-          const diffX = Math.abs(event.pageX - startClickX);
-          const diffY = Math.abs(event.pageY - startClickY);
-
-          if (diffX < clickDelta && diffY < clickDelta) {
-
-            console.log("click event", event)
-            let rect = container.getBoundingClientRect();
-            let mouse3D = new THREE.Vector3(
-              ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
-              -((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
-              0.1);
-
-            let raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(mouse3D, self.camera);
-
-            // console.log("areaPolygons", self.areaPolygons);
-            let intersects = raycaster.intersectObjects(self.areaPolygons);
-            if (intersects.length) {
-              var mesh = intersects[0]
-              console.log("clicked on:", mesh.object.userData.SA22018__1)
-              // mesh.object.visible = false;
-              // debugger
-              // mesh.material.color.set("blue")
-            }
-
-
-
-            // Click!
-          }
-        });
-
-        // container.addEventListener("click", (event) => {
-        //   console.log("click event", event)
-        //   let rect = container.getBoundingClientRect();
-        //   let mouse3D = new THREE.Vector3(
-        //     ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
-        //     -((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
-        //     0.1);
-        //
-        //   let raycaster = new THREE.Raycaster();
-        //   raycaster.setFromCamera(mouse3D, self.camera);
-        //
-        //   // console.log("areaPolygons", self.areaPolygons);
-        //   let intersects = raycaster.intersectObjects(self.areaPolygons);
-        //   if (intersects.length) {
-        //     var mesh = intersects[0]
-        //     console.log("clicked on:", mesh.object.userData.SA22018__1)
-        //     // mesh.object.visible = false;
-        //     // debugger
-        //     // mesh.material.color.set("blue")
-        //   }
-        //
-        // }, false);
 
         this.camera.position.set(0, 0, 100);
         this.camera.lookAt(0, 0, 0);
+
 
         let controls = this.controls = new MapControls(this.camera, this.renderer.domElement);
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
@@ -199,6 +120,7 @@
           // for(let p of this.areaPolygons) {
           //   this.scene.add(p)
           // }
+          detectClicks(this.renderer.domElement, this.camera, this.areaPolygons, this.$root)
 
           addMapEdgesToScene(response.data, this.scene)
 
