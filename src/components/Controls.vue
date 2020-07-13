@@ -1,7 +1,7 @@
 <template>
     <div>
-        <h3>Controls</h3>
-        <!--<b-form-group label="Dataset: ">-->
+        <h3>CommuterView</h3>
+        <h5>2018 Census data</h5>
         <b-form-group>
             <b-form-radio-group >
                 <b-form-radio v-model="appState.dataset" name="dataset" value="work">Work</b-form-radio>

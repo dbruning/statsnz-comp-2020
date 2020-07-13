@@ -1,16 +1,16 @@
 <template>
     <div id="app">
-        <b-container>
-            <b-row>
-                <b-col>
-                    <h1>Commuter View 2020</h1>
-                </b-col>
-            </b-row>
+        <b-container fluid>
+            <!--<b-row>-->
+            <!--    <b-col>-->
+            <!--        <h1>Commuter View 2020</h1>-->
+            <!--    </b-col>-->
+            <!--</b-row>-->
             <b-row>
                 <b-col cols="12" md="9">
-                    <div class="map-view-outer">
+                    <!--<div class="map-view-outer">-->
                         <MapView class="map-view"/>
-                    </div>
+                    <!--</div>-->
                 </b-col>
                 <b-col cols="12" md="3">
                     <Controls></Controls>

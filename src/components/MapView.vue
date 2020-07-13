@@ -213,9 +213,16 @@
   }
 </script>
 
-<style scoped>
+<style >
     .map-container {
         margin: 1em;
+    }
+
+    canvas {
+        border: 1px solid grey;
+        border-radius: 2px;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
     }
 
 </style>
