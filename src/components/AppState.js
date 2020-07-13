@@ -2,7 +2,8 @@ import Vue from 'vue'
 
 var sharedState = {
     dataset: "",
-    detail: "coarse",
+    dataDetail: "med",
+    graphicsDetail: "med",
     frameRate: 0
 }
 

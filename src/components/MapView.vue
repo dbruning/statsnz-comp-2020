@@ -1,8 +1,6 @@
 <template>
     <div>
         <div id="map-container" style="height:600px"></div>
-        <p> Dataset: {{appState.dataset}}</p>
-
     </div>
 </template>
 
