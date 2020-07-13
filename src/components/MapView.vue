@@ -73,6 +73,7 @@
         this.chunks = [];
 
 
+        // this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(this.renderer.domElement);
@@ -163,29 +164,12 @@
 
 
           this.areaPolygons = makePolygons(response.data)
-          // for(let p of this.areaPolygons) {
-          //   this.scene.add(p)
-          // }
+          for(let p of this.areaPolygons) {
+            this.scene.add(p)
+          }
 
           addMapEdgesToScene(response.data, this.scene)
 
-          // // https://github.com/topojson/topojson-client
-          // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
-          // // Turn those multiline strings into LineSegments that three.js knows how to draw
-          // let nzWireframe = wireframe(nzMesh, new THREE.LineBasicMaterial({color: '#4d966b'}));
-          // this.scene.add(nzWireframe)
-
-          // // Use topojson-client to parse the topojson into an array of features
-          // // https://github.com/topojson/topojson-client
-          // let nzFeatures = topojson.feature(topology, topology.objects["statistical-area-2-2018-generalised"])
-          // // console.log("got features from topojson:", nzFeatures)
-          // let geometry = featuresToGeometry(nzFeatures.features)
-          // let mesh = new THREE.Mesh(geometry, mapMaterial)
-          // this.scene.add(mesh)
-
-
-          // Remember them so we can detect clicks on them
-          // this.mapMeshes.push(mesh);
         })
       },
       getVisualisationData() {
