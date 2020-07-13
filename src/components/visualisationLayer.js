@@ -4,6 +4,8 @@ import {eastingToMap, northingToMap} from "./nz";
 
 let THREE = Three
 
+let downloadedRows = []
+
 function getSettingsForDataset(dataset) {
   return {
     csv: (dataset == 'work') ? '/work.csv' : '/education.csv',
@@ -40,10 +42,12 @@ export function addVisualisationData(scene, appState) {
 
   let highestRowTotal = 0;
 
+  downloadedRows.length = 0;
   papa.parse(csv, {
     download: true,
     header: true,
     step: function (row, parser) {
+      downloadedRows.push(row);
       // Set the highest row total, for progress, first time through
       if (highestRowTotal == 0) {
         highestRowTotal = row.data.Total
@@ -101,11 +105,13 @@ export function addVisualisationData(scene, appState) {
   return result;
 }
 
-export function getRegionData(regionName, appState) {
-  debugger
+export function getRegionData(regionName, appState, areaPolygons) {
   console.log("Getting region data for region name:", regionName)
 
-  let result = []
+  let result = {
+    movementData: [],
+    areaPolygon: null
+  }
 
   let material = new Three.MeshPhongMaterial({color: 0xffff00});
   let mergedGeometry = new Three.Geometry;
@@ -113,16 +119,20 @@ export function getRegionData(regionName, appState) {
 
   let {csv, toEastingField, toNorthingField, toNameField} = getSettingsForDataset(appState.dataset)
 
+  // Try to find a region polygon with that name
+  result.areaPolygon = areaPolygons.find(p => p.userData.SA22018__1 == regionName)
+
   papa.parse(csv, {
     download: true,
     header: true,
     step: function (row, parser) {
 
+      // Build up results showing movement to & from the highlighted region
       if (row.data.SA2_name_usual_residence_address == regionName) {
-        result.push({to: row.data[toNameField], count: row.data.Total})
+        result.movementData.push({to: row.data[toNameField], count: row.data.Total})
 
       } else if (row.data[toNameField] == regionName) {
-        result.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
+        result.movementData.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
       }
     },
     complete: function () {

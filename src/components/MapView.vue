@@ -39,6 +39,7 @@
         mapMeshes: null,
         chunks: null,
         hasEverRendered: null,
+        highlightedRegionPolygon: null,
         visualisationData: []
       }
     },
@@ -149,7 +150,12 @@
 
       this.$root.$on('regionClicked', function(data) {
         // self.regionName = data.SA22018__1
-        let regionData = getRegionData(data.SA22018__1, appState)
+        let regionData = getRegionData(data.SA22018__1, appState, self.areaPolygons)
+        if (regionData.areaPolygon) {
+          if (self.highlightedRegionPolygon) self.scene.remove(self.highlightedRegionPolygon)
+          self.highlightedRegionPolygon = regionData.areaPolygon
+          self.scene.add(self.highlightedRegionPolygon)
+        }
 
         // console.log("Region clicked:", data)
 
