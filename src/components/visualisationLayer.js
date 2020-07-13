@@ -58,43 +58,16 @@ export function addVisualisationData(scene, appState) {
         return;
       }
 
-      function getHopGeometry(row, toEastingField, toNorthingField) {
 
-        let from = {
-          x: eastingToMap(row.data.SA2_usual_residence_easting),
-          y: northingToMap(row.data.SA2_usual_residence_northing)
-        }
-        let to = {
-          x: eastingToMap(row.data[toEastingField]),
-          y: northingToMap(row.data[toNorthingField])
-        }
-        let midpoint = {
-          x: (from.x + to.x) / 2,
-          y: (from.y + to.y) / 2
-        }
+      // Figure out the geometry of the hop for this row
+      let hopMesh = getHopGeometry(row, toEastingField, toNorthingField, material)
 
-        let op = from.y - to.y;
-        let ad = from.x - to.x;
-        let theta = Math.atan(op / ad);
-        let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
-
-        let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
-        geometry.rotateX(Math.PI / 2)
-
-        let mesh = new Three.Mesh(geometry, material);
-
-        mesh.rotateZ(theta)
-
-        mesh.position.x = midpoint.x
-        mesh.position.y = midpoint.y
-        mesh.position.z = 0;
-
-        return mesh;
-      }
-      let hopMesh = getHopGeometry(row, toEastingField, toNorthingField)
-
+      // Merge it into our merge geometry
       mergedGeometry.mergeMesh(hopMesh);
+
+      // If we've now merged 300 geometries, add that to the scene
       if (countMerged++ > 300) {
+
         let mesh = new Three.Mesh(mergedGeometry, material);
         scene.add(mesh);
         result.push(mesh)
@@ -102,6 +75,7 @@ export function addVisualisationData(scene, appState) {
         mergedGeometry = new Three.Geometry;
         countMerged = 0;
 
+        // Have a wee lie down, so the renderer can have a chance to render.
         if (!parser.paused()) {
           parser.pause()
         }
@@ -111,12 +85,10 @@ export function addVisualisationData(scene, appState) {
             parser.resume()
         }, 100)
       }
-
-      // self.scene.add(mesh);
-      // self.scene.add(new Three.Mesh(mergedGeometry, material));
     },
     complete: function () {
 
+      // Add the final mesh to the scene & results
       let mesh = new Three.Mesh(mergedGeometry, material);
       scene.add(mesh);
       result.push(mesh)
@@ -127,4 +99,39 @@ export function addVisualisationData(scene, appState) {
 
   return result;
 }
+
+function getHopGeometry(row, toEastingField, toNorthingField, material) {
+
+  let from = {
+    x: eastingToMap(row.data.SA2_usual_residence_easting),
+    y: northingToMap(row.data.SA2_usual_residence_northing)
+  }
+  let to = {
+    x: eastingToMap(row.data[toEastingField]),
+    y: northingToMap(row.data[toNorthingField])
+  }
+  let midpoint = {
+    x: (from.x + to.x) / 2,
+    y: (from.y + to.y) / 2
+  }
+
+  let op = from.y - to.y;
+  let ad = from.x - to.x;
+  let theta = Math.atan(op / ad);
+  let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
+
+  let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
+  geometry.rotateX(Math.PI / 2)
+
+  let mesh = new Three.Mesh(geometry, material);
+
+  mesh.rotateZ(theta)
+
+  mesh.position.x = midpoint.x
+  mesh.position.y = midpoint.y
+  mesh.position.z = 0;
+
+  return mesh;
+}
+
 
