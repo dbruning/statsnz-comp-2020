@@ -10,18 +10,16 @@
   import * as Three from 'three'
   import CameraControls from 'camera-controls';
   import axios from 'axios'
-  import {vertex, wireframe} from './ThreeUtils.js';
   import * as papa from 'papaparse'
-  import * as topojson from 'topojson-client'
 
   import appState from '@/components/AppState'
-  import {featuresToGeometry} from "./ThreeUtils";
+  import {featuresToGeometry} from "./mapPolygonsLayer";
   import {eastingToMap, northingToMap} from "./nz";
+  import {addMapEdgesToScene} from "./mapEdgesLayer";
 
   let THREE = Three;
 
   CameraControls.install({THREE: Three});
-  // import educationData from "../assets/education.csv";
 
   export default {
     name: 'ThreeTest',
@@ -31,12 +29,6 @@
         appState: appState
       }
     },
-    // computed() {
-    //   selectedDataset: function() {
-    //     return "poop"
-    //
-    //   }
-    // },
     static() {
       return {
         clock: null,
@@ -61,32 +53,19 @@
 
         this.mapMeshes = []
 
-
         this.clock = new Three.Clock();
         this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 1, 10000);
-        // this.camera.lookAt(this.midEasting, this.midNorthing, 0)
-        // this.camera.up.set(0, 0, 1)
-        // this.camera.up.set(0, 1, 0)
-        // this.camera.position.set(170, 470, -1500);
-        // this.camera.position.set(170, 529, 0.0005);
-        // this.camera.position.set(0, 0, 1500);
-        // this.camera.lookAt(this.midEasting, this.midNorthing * 10.5, 0);
-        // console.log("setting camera position", this.camera.position.x, this.camera.position.y, this.camera.position.z)
-        // this.camera.position.y = this.midNorthing + 600;
-        // this.camera.position.z = 600;
-
         this.scene = new Three.Scene();
 
-        const gridHelper = new Three.GridHelper(100, 100);
-        // gridHelper.position.y = - 1;
-        gridHelper.rotateX(Math.PI / 2);
-        this.scene.add(gridHelper);
+        // const gridHelper = new Three.GridHelper(100, 100);
+        // gridHelper.rotateX(Math.PI / 2);
+        // this.scene.add(gridHelper);
 
-        const mesh = new Three.Mesh(
-          new Three.BoxGeometry(1, 1, 1),
-          new Three.MeshBasicMaterial({color: 0xff0000, wireframe: true})
-        );
-        this.scene.add(mesh);
+        // const mesh = new Three.Mesh(
+        //   new Three.BoxGeometry(1, 1, 1),
+        //   new Three.MeshBasicMaterial({color: 0xff0000, wireframe: true})
+        // );
+        // this.scene.add(mesh);
 
         this.chunks = [];
 
@@ -134,8 +113,10 @@
         // https://github.com/yomotsu/camera-controls
         this.controls = new CameraControls(this.camera, this.renderer.domElement);
         this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
+
         this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE;
         this.controls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
+        this.controls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
         // this.controls.dollySpeed = 0.3;
         // let height = 10
         // this.controls.setTarget(midX, midY, 0)
@@ -184,24 +165,25 @@
         axios.get("/nz_topojson_simplified.json").then(response => {
           // console.log("got topojson")
           let topology = response.data
-          // Use topojson-client to parse the topojson into an array of multiline strings
-          // https://github.com/topojson/topojson-client
+          addMapEdgesToScene(response.data, this.scene)
+          // // Use topojson-client to parse the topojson into an array of multiline strings
+          // // https://github.com/topojson/topojson-client
           // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
-          // Turn those multiline strings into LineSegments that three.js knows how to draw
+          // // Turn those multiline strings into LineSegments that three.js knows how to draw
           // let nzWireframe = wireframe(nzMesh, new THREE.LineBasicMaterial({color: '#4d966b'}));
           // this.scene.add(nzWireframe)
 
-          // Use topojson-client to parse the topojson into an array of features
-          // https://github.com/topojson/topojson-client
-          let nzFeatures = topojson.feature(topology, topology.objects["statistical-area-2-2018-generalised"])
-          // console.log("got features from topojson:", nzFeatures)
-          let geometry = featuresToGeometry(nzFeatures.features)
-          let mesh = new THREE.Mesh(geometry, mapMaterial)
-          this.scene.add(mesh)
+          // // Use topojson-client to parse the topojson into an array of features
+          // // https://github.com/topojson/topojson-client
+          // let nzFeatures = topojson.feature(topology, topology.objects["statistical-area-2-2018-generalised"])
+          // // console.log("got features from topojson:", nzFeatures)
+          // let geometry = featuresToGeometry(nzFeatures.features)
+          // let mesh = new THREE.Mesh(geometry, mapMaterial)
+          // this.scene.add(mesh)
 
 
           // Remember them so we can detect clicks on them
-          this.mapMeshes.push(mesh);
+          // this.mapMeshes.push(mesh);
         })
       },
       getVisualisationData() {

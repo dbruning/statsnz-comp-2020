@@ -1,3 +1,8 @@
+import * as Three from 'three'
+import * as d3 from "d3";
+import {Vector3} from "three";
+
+let THREE = Three;
 
 export const scaleFactor = 10000;
 
@@ -18,6 +23,19 @@ export function northingToMap(northing) {
 
 export function eastingToMap(easting) {
   return (easting / scaleFactor) - extent.midEasting;
+}
+
+
+export function nzgdToVector2(twoPointArray) {
+  return new THREE.Vector2(
+    eastingToMap(twoPointArray[0]), northingToMap(twoPointArray[1])
+  );
+}
+
+export function nzgdToVector3(twoPointArray) {
+  return new THREE.Vector3(
+    eastingToMap(twoPointArray[0]), northingToMap(twoPointArray[1]), 0
+  );
 }
 
 
