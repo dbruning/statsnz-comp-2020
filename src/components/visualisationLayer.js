@@ -7,15 +7,10 @@ let THREE = Three
 let chunks = [];
 
 export function addVisualisationData(scene, appState) {
+  let result = []
+
   // let material = new Three.MeshBasicMaterial({color: 0xffff00});
   let material = new Three.MeshPhongMaterial({color: 0xffff00});
-  let ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
-
-  scene.add( ambientLight );
-
-  let light = new THREE.DirectionalLight( 0xffffff );
-  light.position.set( 0, 1, 1 ).normalize();
-  scene.add(light);
 
   let self = this
 
@@ -27,11 +22,20 @@ export function addVisualisationData(scene, appState) {
   let toEastingField = (appState.dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting';
   let toNorthingField = (appState.dataset == 'work') ? 'SA2_workplace_northing' : 'SA2_educational_northing';
 
+  let ignoreBelowTotal = 50;
+  if (appState.dataDetail == "low") {
+    ignoreBelowTotal = 200;
+  } else if (appState.dataDetail == "med") {
+    ignoreBelowTotal = 50;
+  } else if (appState.dataDetail == "high") {
+    ignoreBelowTotal = 10;
+  }
+
   papa.parse(csv, {
     download: true,
     header: true,
     step: function (row, parser) {
-      if (row.data.Total < 50) {
+      if (row.data.Total < ignoreBelowTotal) {
         return;
       }
       let from = {
@@ -78,7 +82,10 @@ export function addVisualisationData(scene, appState) {
 
       mergedGeometry.mergeMesh(mesh);
       if (countMerged++ > 300) {
-        scene.add(new Three.Mesh(mergedGeometry, material));
+        let mesh = new Three.Mesh(mergedGeometry, material);
+        scene.add(mesh);
+        result.push(mesh)
+
         mergedGeometry = new Three.Geometry;
         countMerged = 0;
 
@@ -97,9 +104,12 @@ export function addVisualisationData(scene, appState) {
     },
     complete: function () {
 
-      scene.add(new Three.Mesh(mergedGeometry, material));
-      // this.renderer.render(this.scene, this.camera);
+      let mesh = new Three.Mesh(mergedGeometry, material);
+      scene.add(mesh);
+      result.push(mesh)
     }
   });
+
+  return result;
 }
 

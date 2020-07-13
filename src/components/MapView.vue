@@ -42,6 +42,7 @@
         mapMeshes: null,
         chunks: null,
         hasEverRendered: null,
+        visualisationData: []
       }
     },
     created() {
@@ -85,15 +86,15 @@
 
           // console.log("click: ", event)
           let mouse3D = new THREE.Vector3(
-            ( ( event.clientX - rect.left ) / ( rect.right - rect.left ) ) * 2 - 1,
-            - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1,
-            0.1 );
+            ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
+            -((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
+            0.1);
 
-          let raycaster =  new THREE.Raycaster();
-          raycaster.setFromCamera( mouse3D, self.camera );
+          let raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(mouse3D, self.camera);
 
           // console.log("areaPolygons", self.areaPolygons);
-          let intersects = raycaster.intersectObjects( self.areaPolygons);
+          let intersects = raycaster.intersectObjects(self.areaPolygons);
           if (intersects.length) {
             var mesh = intersects[0]
             console.log("clicked on:", mesh.object.userData.SA22018__1)
@@ -129,36 +130,12 @@
         // controls.maxAzimuthAngle = 0.95 * Math.PI;
         controls.minPolarAngle = 0.05 * Math.PI;
         controls.maxPolarAngle = 0.95 * Math.PI;
-        // this.mouseButtons.LEFT = THREE.MOUSE.PAN;
-        // this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
-        //
-        // this.touches.ONE = THREE.TOUCH.PAN;
-        // this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
 
-        // // https://github.com/yomotsu/camera-controls
-        // this.controls = new CameraControls(this.camera, this.renderer.domElement);
-        //
-        // // Set mouse controls
-        // this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
-        // this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE;
-        // // this.controls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
-        // this.controls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
-        //
-        // // Set touch controls
-        // this.controls.touches.one = CameraControls.ACTION.TDOLLY;
-        // this.controls.dollySpeed = 0.3;
-        // let height = 10
-        // this.controls.setTarget(midX, midY, 0)
-        // this.controls.moveTo(midX, midY, height)
-        // this.controls.distance = 200;
-        // this.controls.setLookAt = (
-        //   midX, midY, height,
-        //     midX, midY, 0,
-        //     true
-        // )
-        // this.controls = new TrackballControls(this.camera, this.renderer.domElement);
-        // this.controls = new FlyControls(this.camera, this.renderer.domElement);
-        // this.controls = new DragControls(this.camera, this.renderer.domElement);
+        let light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(0, 1, 1).normalize();
+        this.scene.add(light);
+        let ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+        this.scene.add(ambientLight);
 
       },
       animate: function () {
@@ -204,14 +181,22 @@
 
       // Get visualisation data when we know which dataset to load
       this.$root.$on("load", function () {
-        addVisualisationData(self.scene, self.appState)
+        // Remove any existing visualisation data
+        if (self.visualisationData && self.visualisationData.length) {
+          for (let vd of self.visualisationData) {
+            self.scene.remove(vd);
+          }
+        }
+
+        // Add new visualisation data
+        self.visualisationData = addVisualisationData(self.scene, self.appState)
       })
 
     },
   }
 </script>
 
-<style >
+<style>
     .map-container {
         margin: 1em;
     }

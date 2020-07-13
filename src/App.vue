@@ -12,8 +12,9 @@
                         <MapView class="map-view"/>
                     <!--</div>-->
                 </b-col>
-                <b-col cols="12" md="3">
+                <b-col cols="12" md="3" class="control-column">
                     <Controls></Controls>
+                    <PerfStats></PerfStats>
                 </b-col>
             </b-row>
         </b-container>
@@ -24,6 +25,7 @@
 <script>
   import MapView from './components/MapView.vue'
   import Controls from './components/Controls.vue'
+  import PerfStats from './components/PerfStats.vue'
 
   import AppState from './components/AppState.js'
 
@@ -39,7 +41,7 @@
   export default {
     name: 'App',
     components: {
-      MapView, Controls
+      MapView, Controls, PerfStats
     }
   }
 </script>
@@ -64,5 +66,12 @@
         /*text-align: center;*/
         color: #42b983;
         margin-top: 1em;
+    }
+
+    .control-column {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
     }
 </style>
