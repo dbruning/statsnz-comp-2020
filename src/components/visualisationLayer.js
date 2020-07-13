@@ -4,15 +4,15 @@ import {eastingToMap, northingToMap} from "./nz";
 
 let THREE = Three
 
-let chunks = [];
+
+export function getRegionData(regionName) {
+
+}
 
 export function addVisualisationData(scene, appState) {
   let result = []
 
-  // let material = new Three.MeshBasicMaterial({color: 0xffff00});
   let material = new Three.MeshPhongMaterial({color: 0xffff00});
-
-  let self = this
 
   let mergedGeometry = new Three.Geometry;
 
@@ -21,7 +21,6 @@ export function addVisualisationData(scene, appState) {
   let csv = (appState.dataset == 'work') ? '/work.csv' : '/education.csv'
   let toEastingField = (appState.dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting';
   let toNorthingField = (appState.dataset == 'work') ? 'SA2_workplace_northing' : 'SA2_educational_northing';
-  let dataRowCount= (appState.dataset == 'work') ? 50870 : 22430;
 
   let ignoreBelowTotal = 50;
   if (appState.dataDetail == "low") {
@@ -43,53 +42,58 @@ export function addVisualisationData(scene, appState) {
     download: true,
     header: true,
     step: function (row, parser) {
+      // Set the highest row total, for progress, first time through
       if (highestRowTotal == 0) {
         highestRowTotal = row.data.Total
       }
 
+      // Calculate progress
       if (rowsProcessed++ % 100 == 0) {
         let rawFractionComplete = (highestRowTotal - row.data.Total) / (highestRowTotal - ignoreBelowTotal)
         appState.progressPercent = Math.pow(rawFractionComplete, 3) * 100
       }
+
+      // Ignore data below user-selected limit
       if (row.data.Total < ignoreBelowTotal) {
         return;
       }
-      let from = {
-        x: eastingToMap(row.data.SA2_usual_residence_easting),
-        y: northingToMap(row.data.SA2_usual_residence_northing)
+
+      function getHopGeometry(row, toEastingField, toNorthingField) {
+
+        let from = {
+          x: eastingToMap(row.data.SA2_usual_residence_easting),
+          y: northingToMap(row.data.SA2_usual_residence_northing)
+        }
+        let to = {
+          x: eastingToMap(row.data[toEastingField]),
+          y: northingToMap(row.data[toNorthingField])
+        }
+        let midpoint = {
+          x: (from.x + to.x) / 2,
+          y: (from.y + to.y) / 2
+        }
+
+        let op = from.y - to.y;
+        let ad = from.x - to.x;
+        let theta = Math.atan(op / ad);
+        let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
+
+        let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
+        geometry.rotateX(Math.PI / 2)
+
+        let mesh = new Three.Mesh(geometry, material);
+
+        mesh.rotateZ(theta)
+
+        mesh.position.x = midpoint.x
+        mesh.position.y = midpoint.y
+        mesh.position.z = 0;
+
+        return mesh;
       }
-      let to = {
-        x: eastingToMap(row.data[toEastingField]),
-        y: northingToMap(row.data[toNorthingField])
-      }
-      let midpoint = {
-        x: (from.x + to.x) / 2,
-        y: (from.y + to.y) / 2
-      }
-      // console.log("from, to, midpoint:", from, to, midpoint)
-      let op = from.y - to.y;
-      let ad = from.x - to.x;
-      let theta = Math.atan(op / ad);
-      let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
-      let scale = hy
+      let hopMesh = getHopGeometry(row, toEastingField, toNorthingField)
 
-      // console.log("plotting row data", row.data)
-      // let geometry = new Three.TorusBufferGeometry(hy/2, row.data.Total / 5000, 8, 10, Math.PI);
-      let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
-      // geometry = new Three.WireframeGeometry(geometry)
-      geometry.rotateX(Math.PI / 2)
-
-      // let mesh = new Three.Mesh(geometry.scale(0.5, 0.5, 0.5), material);
-      let mesh = new Three.Mesh(geometry, material);
-
-      // mesh.scale.set(scale, scale, scale);
-      mesh.rotateZ(theta)
-
-      mesh.position.x = midpoint.x
-      mesh.position.y = midpoint.y
-      mesh.position.z = 0;
-
-      mergedGeometry.mergeMesh(mesh);
+      mergedGeometry.mergeMesh(hopMesh);
       if (countMerged++ > 300) {
         let mesh = new Three.Mesh(mergedGeometry, material);
         scene.add(mesh);

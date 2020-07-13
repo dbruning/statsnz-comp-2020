@@ -116,6 +116,7 @@
           // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
 
 
+          // We keep area polygons around mainly to detect clicks with - only the edges (below) are drawn
           this.areaPolygons = makePolygons(response.data)
           // for(let p of this.areaPolygons) {
           //   this.scene.add(p)
