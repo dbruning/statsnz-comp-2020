@@ -4,7 +4,9 @@ var sharedState = {
     dataset: "",
     dataDetail: "med",
     graphicsDetail: "med",
-    frameRate: 0
+    frameRate: 0,
+    progressTask: "",
+    progressPercent: 0
 }
 
 var tmpVm = new Vue({ data : { sharedState} });

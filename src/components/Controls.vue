@@ -27,11 +27,24 @@
 
         <b-btn variant="primary" class="load-button" @click="loadClicked">Load</b-btn>
 
+        <!--<b-progress max="100" v-if="appState.progressTask.length" variant="primary">-->
+        <!--    <b-progress-bar :value="appState.progressPercent" :label="`${appState.progressTask}%`"></b-progress-bar>-->
+        <!--</b-progress>-->
+
+        <div class="progress-line" v-if="appState.progressTask.length">
+            <div>{{appState.progressTask}}</div>
+            <div>{{Math.ceil(appState.progressPercent) }}%</div>
+
+        </div>
+
     </div>
 </template>
 
 <script>
   import appState from '@/components/AppState'
+
+  // appState.progressTask = "testing"
+  // appState.progressPercent= 5
 
 
   export default {
@@ -57,6 +70,11 @@
 <style>
     .load-button, .full-width {
         width: 100%;
+    }
+    .progress-line {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
     }
 </style>
 

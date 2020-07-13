@@ -21,6 +21,7 @@ export function addVisualisationData(scene, appState) {
   let csv = (appState.dataset == 'work') ? '/work.csv' : '/education.csv'
   let toEastingField = (appState.dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting';
   let toNorthingField = (appState.dataset == 'work') ? 'SA2_workplace_northing' : 'SA2_educational_northing';
+  let dataRowCount= (appState.dataset == 'work') ? 50870 : 22430;
 
   let ignoreBelowTotal = 50;
   if (appState.dataDetail == "low") {
@@ -31,10 +32,25 @@ export function addVisualisationData(scene, appState) {
     ignoreBelowTotal = 10;
   }
 
+  let rowsProcessed = 0;
+
+  appState.progressTask = "Loading data..."
+  // appState.progressPercent = 0
+
+  let highestRowTotal = 0;
+
   papa.parse(csv, {
     download: true,
     header: true,
     step: function (row, parser) {
+      if (highestRowTotal == 0) {
+        highestRowTotal = row.data.Total
+      }
+
+      if (rowsProcessed++ % 100 == 0) {
+        let rawFractionComplete = (highestRowTotal - row.data.Total) / (highestRowTotal - ignoreBelowTotal)
+        appState.progressPercent = Math.pow(rawFractionComplete, 3) * 100
+      }
       if (row.data.Total < ignoreBelowTotal) {
         return;
       }
@@ -45,8 +61,6 @@ export function addVisualisationData(scene, appState) {
       let to = {
         x: eastingToMap(row.data[toEastingField]),
         y: northingToMap(row.data[toNorthingField])
-        // x: row.data.SA2_educational_easting / 10000,
-        // y: row.data.SA2_educational_northing / 10000
       }
       let midpoint = {
         x: (from.x + to.x) / 2,
@@ -107,6 +121,8 @@ export function addVisualisationData(scene, appState) {
       let mesh = new Three.Mesh(mergedGeometry, material);
       scene.add(mesh);
       result.push(mesh)
+
+      appState.progressTask = ""
     }
   });
 
