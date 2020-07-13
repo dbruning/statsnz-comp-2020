@@ -19,16 +19,15 @@ let THREE = Three
 //     translate(point[0]), translate(point[1]),0) ;
 // }
 
-let polygons = []
 
 
 // Based on: https://stackoverflow.com/a/57744746/84898
 export function makePolygons(topoJsonData) {
+  const shapes = [];
+  let result = []
   // Use topojson-client to parse the topojson into an array of multiline strings
   // https://github.com/topojson/topojson-client
   let featuresObject = topojson.feature(topoJsonData, topoJsonData.objects["statistical-area-2-2018-generalised"])
-  debugger
-  const shapes = [];
 
   if (!featuresObject || !featuresObject.features) return
   for (const feature of featuresObject.features) {
@@ -78,9 +77,14 @@ export function makePolygons(topoJsonData) {
     geometry.computeBoundingSphere();
     geometry.computeBoundingBox();
 
-    polygons.push(geometry)
+    let material = new Three.MeshBasicMaterial({color: 0xffff00});
+    let mesh = new THREE.Mesh(geometry, material)
+
+    result.push(mesh)
 
   }
+
+  return result;
 
   // // TODO: return the shapes, merge them for display (maybe edges?) but keep separate for click detection
   // const geometry = new THREE.ShapeBufferGeometry(shapes)

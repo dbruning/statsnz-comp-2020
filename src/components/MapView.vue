@@ -38,6 +38,7 @@
         controls: null,
         renderer: null,
         mesh: null,
+        areaPolygons: null,
         mapMeshes: null,
         chunks: null,
         hasEverRendered: null,
@@ -53,9 +54,10 @@
         let container = document.getElementById('map-container');
 
         this.mapMeshes = []
+        this.areaPolygons = []
 
         this.clock = new Three.Clock();
-        this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 1, 10000);
+        this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 10000);
         this.scene = new Three.Scene();
 
         // const gridHelper = new Three.GridHelper(100, 100);
@@ -83,8 +85,8 @@
           let raycaster =  new THREE.Raycaster();
           raycaster.setFromCamera( mouse3D, self.camera );
 
-          console.log("mapMeshes", self.mapMeshes);
-          let intersects = raycaster.intersectObjects( self.mapMeshes);
+          console.log("areaPolygons", self.areaPolygons);
+          let intersects = raycaster.intersectObjects( self.areaPolygons);
           console.log(intersects)
 
         }, false);
@@ -153,13 +155,13 @@
       getMapData() {
         axios.get("/nz_topojson_simplified.json").then(response => {
           // console.log("got topojson")
-          let topology = response.data
-          let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
+          // let topology = response.data
+          // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
 
           addMapEdgesToScene(response.data, this.scene)
 
-          makePolygons(response.data)
-          // // Use topojson-client to parse the topojson into an array of multiline strings
+          this.areaPolygons = makePolygons(response.data)
+
           // // https://github.com/topojson/topojson-client
           // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
           // // Turn those multiline strings into LineSegments that three.js knows how to draw
