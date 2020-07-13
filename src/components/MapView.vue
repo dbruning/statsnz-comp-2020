@@ -16,6 +16,7 @@
 
   import appState from '@/components/AppState'
   import {featuresToGeometry} from "./ThreeUtils";
+  import {eastingToMap, northingToMap} from "./nz";
 
   let THREE = Three;
 
@@ -181,7 +182,7 @@
         let mapMaterial = new Three.MeshBasicMaterial({color: '#4d966b', wireframe: false})
         // let mapMaterial = new THREE.BasicMaterial({color: '#4d966b'}));
         axios.get("/nz_topojson_simplified.json").then(response => {
-          console.log("got topojson")
+          // console.log("got topojson")
           let topology = response.data
           // Use topojson-client to parse the topojson into an array of multiline strings
           // https://github.com/topojson/topojson-client
@@ -193,7 +194,7 @@
           // Use topojson-client to parse the topojson into an array of features
           // https://github.com/topojson/topojson-client
           let nzFeatures = topojson.feature(topology, topology.objects["statistical-area-2-2018-generalised"])
-          console.log("got features from topojson:", nzFeatures)
+          // console.log("got features from topojson:", nzFeatures)
           let geometry = featuresToGeometry(nzFeatures.features)
           let mesh = new THREE.Mesh(geometry, mapMaterial)
           this.scene.add(mesh)
@@ -227,12 +228,12 @@
               return;
             }
             let from = {
-              x: row.data.SA2_usual_residence_easting / 10000,
-              y: row.data.SA2_usual_residence_northing / 10000
+              x: eastingToMap(row.data.SA2_usual_residence_easting),
+              y: northingToMap(row.data.SA2_usual_residence_northing)
             }
             let to = {
-              x: row.data[toEastingField] / 10000,
-              y: row.data[toNorthingField] / 10000
+              x: eastingToMap(row.data[toEastingField]),
+              y: northingToMap(row.data[toNorthingField])
               // x: row.data.SA2_educational_easting / 10000,
               // y: row.data.SA2_educational_northing / 10000
             }

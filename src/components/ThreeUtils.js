@@ -1,12 +1,13 @@
 import * as Three from 'three'
 import * as d3 from "d3";
 import {northingToMap, eastingToMap} from "./nz.js";
+import {Vector3} from "three";
 
 let THREE = Three;
 
 function nzgdToVector2(twoPointArray) {
   return new THREE.Vector2(
-    northingToMap(twoPointArray[0]), eastingToMap(twoPointArray[1])
+    eastingToMap(twoPointArray[0]), northingToMap(twoPointArray[1])
   );
 }
 
@@ -37,7 +38,7 @@ function nzgdToVector3(twoPointArray) {
 export function wireframe(multilinestring, material) {
   let geometry = new THREE.Geometry;
   multilinestring.coordinates.forEach(function (line) {
-    d3.pairs(line.map(nzgdToVector3()), function (a, b) {
+    d3.pairs(line.map(nzgdToVector3), function (a, b) {
       // d3.pairs(line, function(a, b) {
       geometry.vertices.push(a, b);
     });
@@ -74,12 +75,15 @@ export function featuresToGeometry(features) {
       // const contour = coordinate[0];
     if (!part || !part.coordinates || part.coordinates.length == 0) continue
       for (const point of part.coordinates[0]) {
-        points.push(new nzgdToVector2(point));
+        // console.log("point:", point[0], point[1])
+        let vector= nzgdToVector2(point);
+        // console.log("vector:", vector)
+        points.push(vector);
       }
 
       const shape = new THREE.Shape(points);
 
-      console.log("shape", shape)
+      // console.log("shape", shape)
 
       // hole
       // const hole = coordinate[1];
@@ -106,12 +110,15 @@ export function featuresToGeometry(features) {
   //   bevelEnabled: false
   // }
 
+  geometry.computeBoundingSphere();
   geometry.computeBoundingBox();
 
-  console.log("Center before move: ")
-  geometry.center();
-
-  console.log("geometry:", geometry)
+  let center = new Vector3(0,0,0);
+  center = geometry.boundingBox.getCenter(center);
+  console.log("Center of map: ", center)
+  // geometry.center();
+  //
+  // console.log("geometry:", geometry)
   // geometry.computeBoundingSphere();
 
   return geometry;
