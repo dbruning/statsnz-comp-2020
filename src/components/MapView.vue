@@ -15,6 +15,7 @@
   import * as topojson from 'topojson-client'
 
   import appState from '@/components/AppState'
+  import {featuresToGeometry} from "./ThreeUtils";
 
 
   let THREE = Three;
@@ -85,16 +86,16 @@
 
         this.scene = new Three.Scene();
 
-        const gridHelper = new Three.GridHelper( 100, 100 );
+        const gridHelper = new Three.GridHelper(100, 100);
         // gridHelper.position.y = - 1;
         gridHelper.rotateX(Math.PI / 2);
-        this.scene.add( gridHelper );
+        this.scene.add(gridHelper);
 
         const mesh = new Three.Mesh(
-          new Three.BoxGeometry( 1, 1, 1 ),
-          new Three.MeshBasicMaterial( { color: 0xff0000, wireframe: true } )
+          new Three.BoxGeometry(1, 1, 1),
+          new Three.MeshBasicMaterial({color: 0xff0000, wireframe: true})
         );
-        this.scene.add( mesh );
+        this.scene.add(mesh);
 
         this.chunks = [];
 
@@ -110,18 +111,18 @@
         gridHelper.translateY(midY)
 
         // this.camera.up.set( 0, 1, 0 );
-        this.camera.position.set( midX, midY,  100);
-        this.camera.up.set( 0, 1, 0 );
+        this.camera.position.set(midX, midY, 100);
+        this.camera.up.set(0, 1, 0);
         // this.camera.lookAt(0, 50, 0);
 
         // https://github.com/yomotsu/camera-controls
         this.controls = new CameraControls(this.camera, this.renderer.domElement);
         this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
         this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE;
-        this.controls.mouseButtons.wheel= CameraControls.ACTION.ZOOM;
+        this.controls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
         // this.controls.dollySpeed = 0.3;
         // let height = 10
-        this.controls.setTarget(midX, midY, 0)
+        // this.controls.setTarget(midX, midY, 0)
         // this.controls.moveTo(midX, midY, height)
         // this.controls.distance = 200;
         // this.controls.setLookAt = (
@@ -156,17 +157,29 @@
         // console.log("Camera position: ",position)
         // console.log("Camera position: ",this.controls._position0)
         // if (hasControlsUpdated || !this.hasEverRendered) {
-          this.renderer.render(this.scene, this.camera);
-          // console.log("Controls: ",this.controls)
-          // this.hasEverRendered = true;
+        this.renderer.render(this.scene, this.camera);
+        // console.log("Controls: ",this.controls)
+        // this.hasEverRendered = true;
         // }
       },
       getMapData() {
+        let mapMaterial = new Three.MeshBasicMaterial({color: '#4d966b', wireframe: false})
+        // let mapMaterial = new THREE.BasicMaterial({color: '#4d966b'}));
         axios.get("/nz_topojson_simplified.json").then(response => {
           console.log("got topojson")
-          let topology=response.data
-          let mesh = wireframe(topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"]),
-            new THREE.LineBasicMaterial({color: '#4d966b'}));
+          let topology = response.data
+          // Use topojson-client to parse the topojson into an array of multiline strings
+          // https://github.com/topojson/topojson-client
+          // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
+          // Turn those multiline strings into LineSegments that three.js knows how to draw
+          // let nzWireframe = wireframe(nzMesh, new THREE.LineBasicMaterial({color: '#4d966b'}));
+          // this.scene.add(nzWireframe)
+
+          // Use topojson-client to parse the topojson into an array of features
+          // https://github.com/topojson/topojson-client
+          let nzFeatures = topojson.feature(topology, topology.objects["statistical-area-2-2018-generalised"])
+          let geometry = featuresToGeometry(nzFeatures.features)
+          let mesh = new THREE.Mesh(geometry, mapMaterial);
           this.scene.add(mesh)
         })
       },
@@ -210,7 +223,7 @@
             // console.log("from, to, midpoint:", from, to, midpoint)
             let op = from.y - to.y;
             let ad = from.x - to.x;
-            let theta = Math.atan(op/ad);
+            let theta = Math.atan(op / ad);
             let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
             let scale = hy
 
@@ -221,7 +234,7 @@
 
             // console.log("plotting row data", row.data)
             // let geometry = new Three.TorusBufferGeometry(hy/2, row.data.Total / 5000, 8, 10, Math.PI);
-            let geometry = new Three.TorusGeometry(hy/2, row.data.Total / 5000, 8, 10, Math.PI);
+            let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
             // geometry = new Three.WireframeGeometry(geometry)
             geometry.rotateX(Math.PI / 2)
 
@@ -244,17 +257,17 @@
               if (!parser.paused()) {
                 parser.pause()
               }
-              setTimeout(function() {
+              setTimeout(function () {
                 // results = null
                 if (parser.paused())
                   parser.resume()
-                }, 100)
+              }, 100)
             }
 
             // self.scene.add(mesh);
             // self.scene.add(new Three.Mesh(mergedGeometry, material));
           },
-          complete: function() {
+          complete: function () {
 
             self.scene.add(new Three.Mesh(mergedGeometry, material));
             // this.renderer.render(this.scene, this.camera);
@@ -268,7 +281,7 @@
       let self = this;
 
       // Get visualisation data when we know which dataset to load
-      this.$root.$on("load", function() {
+      this.$root.$on("load", function () {
         self.getVisualisationData()
       })
 

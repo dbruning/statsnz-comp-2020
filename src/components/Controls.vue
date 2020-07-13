@@ -27,6 +27,7 @@
       return {
         selectedDataset: "",
         appState: appState,
+        usedMemory: 0,
         frameRate: 0,
       }
     },
