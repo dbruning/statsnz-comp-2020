@@ -8,7 +8,7 @@
 
 <script>
   import * as Three from 'three'
-  import CameraControls from 'camera-controls';
+  // import CameraControls from 'camera-controls';
   import axios from 'axios'
   import * as papa from 'papaparse'
 
@@ -17,10 +17,11 @@
   import {eastingToMap, northingToMap} from "./nz";
   import {addMapEdgesToScene} from "./mapEdgesLayer";
   import * as topojson from "topojson-client";
+  import {MapControls} from "three/examples/jsm/controls/OrbitControls";
 
   let THREE = Three;
 
-  CameraControls.install({THREE: Three});
+  // CameraControls.install({THREE: Three});
 
   export default {
     name: 'ThreeTest',
@@ -113,16 +114,39 @@
 
         // this.camera.up.set( 0, 1, 0 );
         this.camera.position.set(0, 0, 100);
-        this.camera.up.set(0, 1, 0);
-        // this.camera.lookAt(0, 50, 0);
+        // this.camera.up.set(0, 1, 0);
+        this.camera.lookAt(0, 0, 0);
 
-        // https://github.com/yomotsu/camera-controls
-        this.controls = new CameraControls(this.camera, this.renderer.domElement);
-        this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
+        let controls = this.controls = new MapControls(this.camera, this.renderer.domElement);
+        controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+        controls.dampingFactor = 0.05;
 
-        this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE;
-        this.controls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
-        this.controls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
+        controls.screenSpacePanning = true;
+
+        controls.minDistance = 1;
+        controls.maxDistance = 500;
+
+        // controls.minAzimuthAngle = 0.05 * Math.PI;
+        // controls.maxAzimuthAngle = 0.95 * Math.PI;
+        controls.minPolarAngle = 0.05 * Math.PI;
+        controls.maxPolarAngle = 0.95 * Math.PI;
+        // this.mouseButtons.LEFT = THREE.MOUSE.PAN;
+        // this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+        //
+        // this.touches.ONE = THREE.TOUCH.PAN;
+        // this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+
+        // // https://github.com/yomotsu/camera-controls
+        // this.controls = new CameraControls(this.camera, this.renderer.domElement);
+        //
+        // // Set mouse controls
+        // this.controls.mouseButtons.left = CameraControls.ACTION.TRUCK;
+        // this.controls.mouseButtons.right = CameraControls.ACTION.ROTATE;
+        // // this.controls.mouseButtons.wheel = CameraControls.ACTION.ZOOM;
+        // this.controls.mouseButtons.wheel = CameraControls.ACTION.DOLLY;
+        //
+        // // Set touch controls
+        // this.controls.touches.one = CameraControls.ACTION.TDOLLY;
         // this.controls.dollySpeed = 0.3;
         // let height = 10
         // this.controls.setTarget(midX, midY, 0)
@@ -142,7 +166,8 @@
         // snip
         const delta = this.clock.getDelta();
         // console.log(delta)
-        const hasControlsUpdated = this.controls.update(delta);
+        // const hasControlsUpdated = this.controls.update(delta);
+        this.controls.update()
 
         if (delta > 0) {
           this.appState.frameRate = (this.appState.frameRate * 10 + (1 / delta)) / 11
