@@ -17,9 +17,7 @@
   import appState from '@/components/AppState'
   import {featuresToGeometry} from "./ThreeUtils";
 
-
   let THREE = Three;
-
 
   CameraControls.install({THREE: Three});
   // import educationData from "../assets/education.csv";
@@ -46,14 +44,9 @@
         controls: null,
         renderer: null,
         mesh: null,
+        mapMeshes: null,
         chunks: null,
         hasEverRendered: null,
-        minNorthing: null,
-        maxNorthing: null,
-        midNorthing: null,
-        minEasting: null,
-        maxEasting: null,
-        midEasting: null,
       }
     },
     created() {
@@ -62,14 +55,11 @@
     },
     methods: {
       init: function () {
+        let self = this
         let container = document.getElementById('map-container');
 
-        this.minNorthing = 470;
-        this.maxNorthing = 620;
-        this.minEasting = 115;
-        this.maxEasting = 250;
-        this.midNorthing = (this.maxNorthing + this.minNorthing) / 2;
-        this.midEasting = (this.maxEasting + this.minEasting) / 2;
+        this.mapMeshes = []
+
 
         this.clock = new Three.Clock();
         this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 1, 10000);
@@ -104,14 +94,39 @@
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(this.renderer.domElement);
 
-        let midX = 170
-        let midY = 550
 
-        gridHelper.translateX(midX)
-        gridHelper.translateY(midY)
+        container.addEventListener("click", (event) => {
+          console.log("click: ", event)
+          let mouse3D = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1,
+            -( event.clientY / window.innerHeight ) * 2 + 1,
+            0.5 );
+          let raycaster =  new THREE.Raycaster();
+          raycaster.setFromCamera( mouse3D, self.camera );
+
+          console.log("mapMeshes", self.mapMeshes);
+          let intersects = raycaster.intersectObjects( self.mapMeshes);
+          console.log(intersects)
+
+        }, false);
+
+        // function onClick(event) {
+        //   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        //   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //   raycaster.setFromCamera(mouse, camera);
+        //   intersects = raycaster.intersectObject(mesh);
+        //   if (intersects.length > 0) {
+        //     console.log('ok');
+        //   }
+        // }
+
+        // let midX = 170
+        // let midY = 550
+        //
+        // gridHelper.translateX(midX)
+        // gridHelper.translateY(midY)
 
         // this.camera.up.set( 0, 1, 0 );
-        this.camera.position.set(midX, midY, 100);
+        this.camera.position.set(0, 0, 100);
         this.camera.up.set(0, 1, 0);
         // this.camera.lookAt(0, 50, 0);
 
@@ -178,9 +193,14 @@
           // Use topojson-client to parse the topojson into an array of features
           // https://github.com/topojson/topojson-client
           let nzFeatures = topojson.feature(topology, topology.objects["statistical-area-2-2018-generalised"])
+          console.log("got features from topojson:", nzFeatures)
           let geometry = featuresToGeometry(nzFeatures.features)
-          let mesh = new THREE.Mesh(geometry, mapMaterial);
+          let mesh = new THREE.Mesh(geometry, mapMaterial)
           this.scene.add(mesh)
+
+
+          // Remember them so we can detect clicks on them
+          this.mapMeshes.push(mesh);
         })
       },
       getVisualisationData() {
