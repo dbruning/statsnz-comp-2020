@@ -56,7 +56,7 @@
       }
     },
     created() {
-      // this.getVisualisationData()
+      // Get map data as soon as created
       this.getMapData()
     },
     methods: {
@@ -137,7 +137,12 @@
       animate: function () {
         // snip
         const delta = this.clock.getDelta();
+        // console.log(delta)
         const hasControlsUpdated = this.controls.update(delta);
+
+        if (delta > 0) {
+          this.appState.frameRate = (this.appState.frameRate * 10 + (1 / delta)) / 11
+        }
 
         requestAnimationFrame(this.animate);
 
@@ -168,8 +173,6 @@
       getVisualisationData() {
         this.isLoading = true
 
-        // let geometry = new Three.TorusGeometry(10, 1, 16, 20);
-        // geometry.rotateX(Math.PI / 2)
         let material = new Three.MeshBasicMaterial({color: 0xffff00});
 
         let self = this
@@ -179,7 +182,6 @@
         let mergedGeometry = new Three.Geometry;
 
         let countMerged = 0;
-        // papa.parse('/education.csv', {
 
         let csv = (this.appState.dataset == 'work') ? '/work.csv' : '/education.csv'
         let toEastingField = (this.appState.dataset == 'work') ? 'SA2_workplace_easting' : 'SA2_educational_easting';
@@ -258,29 +260,17 @@
             // this.renderer.render(this.scene, this.camera);
           }
         });
-
       }
-      // import("../assets/education.csv").then(data => {
-      //   debugger;
-      //   console.log("data")
-      //   // csv.parse(data, function(err, data){
-      //   //   console.log("data")
-      //   // })
-      // })
-      //   csv.stringify(data, function(err, data){
-      //     process.stdout.write(data);
-      //   });
-      // });
-      //
-      //
-      //   console.log("got data")
-      // }
     },
     mounted() {
       this.init();
       this.animate();
-      this.getVisualisationData()
-      // this.getMapData()
+      let self = this;
+
+      // Get visualisation data when we know which dataset to load
+      this.$root.$on("load", function() {
+        self.getVisualisationData()
+      })
 
     },
   }
