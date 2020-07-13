@@ -1,5 +1,6 @@
 import * as Three from "three";
 import {nzgdToVector2} from "./nz";
+import * as topojson from "topojson-client";
 
 let THREE = Three
 
@@ -18,18 +19,21 @@ let THREE = Three
 //     translate(point[0]), translate(point[1]),0) ;
 // }
 
+let polygons = []
+
 
 // Based on: https://stackoverflow.com/a/57744746/84898
-export function featuresToGeometry(features) {
-  console.log("featuresToGeometry")
+export function makePolygons(topoJsonData) {
+  // Use topojson-client to parse the topojson into an array of multiline strings
+  // https://github.com/topojson/topojson-client
+  let featuresObject = topojson.feature(topoJsonData, topoJsonData.objects["statistical-area-2-2018-generalised"])
+  debugger
   const shapes = [];
 
-  var i = 0;
-  if (!features) return
-  for (const feature of features) {
+  if (!featuresObject || !featuresObject.features) return
+  for (const feature of featuresObject.features) {
     if (!feature.geometry || !feature.geometry.coordinates) continue;
 
-    // debugger;
     let part;
     if (feature.geometry.type == "Polygon") {
       part = feature.geometry;
@@ -37,8 +41,6 @@ export function featuresToGeometry(features) {
       part = feature.geometry[0];
       // console.log("unknown: " + feature.geometry.type)
     }
-
-    // if (i++ > 10) break;
 
     // for (const part of feature.geometry.coordinates) {
     // For now, skip anything but first part
@@ -71,16 +73,20 @@ export function featuresToGeometry(features) {
     //   }
     //   shape.holes.push(path);
     // }
-    shapes.push(shape);
-    // }
+    // shapes.push(shape);
+    let geometry = new THREE.ShapeBufferGeometry(shape)
+    geometry.computeBoundingSphere();
+    geometry.computeBoundingBox();
+
+    polygons.push(geometry)
 
   }
 
-  // TODO: return the shapes, merge them for display (maybe edges?) but keep separate for click detection
-  const geometry = new THREE.ShapeBufferGeometry(shapes)
-
-  geometry.computeBoundingSphere();
-  geometry.computeBoundingBox();
+  // // TODO: return the shapes, merge them for display (maybe edges?) but keep separate for click detection
+  // const geometry = new THREE.ShapeBufferGeometry(shapes)
+  //
+  // geometry.computeBoundingSphere();
+  // geometry.computeBoundingBox();
 
   // let center = new Vector3(0,0,0);
   // center = geometry.boundingBox.getCenter(center);
@@ -90,6 +96,6 @@ export function featuresToGeometry(features) {
   // console.log("geometry:", geometry)
   // geometry.computeBoundingSphere();
 
-  return geometry;
+  // return geometry;
   // return edgesGeometry;
 }

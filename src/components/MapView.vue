@@ -13,9 +13,10 @@
   import * as papa from 'papaparse'
 
   import appState from '@/components/AppState'
-  import {featuresToGeometry} from "./mapPolygonsLayer";
+  import {featuresToGeometry, makePolygons} from "./mapPolygonsLayer";
   import {eastingToMap, northingToMap} from "./nz";
   import {addMapEdgesToScene} from "./mapEdgesLayer";
+  import * as topojson from "topojson-client";
 
   let THREE = Three;
 
@@ -73,7 +74,6 @@
         this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(this.renderer.domElement);
-
 
         container.addEventListener("click", (event) => {
           console.log("click: ", event)
@@ -148,24 +148,17 @@
         //   hoop.geometry.rotateY(delta)
         // }
 
-        // console.log("hasever: ", this.hasEverRendered)
-        // let p;
-        // let position = this.controls.getPosition({});
-        // console.log("Camera position: ",position)
-        // console.log("Camera position: ",this.controls._position0)
-        // if (hasControlsUpdated || !this.hasEverRendered) {
         this.renderer.render(this.scene, this.camera);
-        // console.log("Controls: ",this.controls)
-        // this.hasEverRendered = true;
-        // }
       },
       getMapData() {
-        let mapMaterial = new Three.MeshBasicMaterial({color: '#4d966b', wireframe: false})
-        // let mapMaterial = new THREE.BasicMaterial({color: '#4d966b'}));
         axios.get("/nz_topojson_simplified.json").then(response => {
           // console.log("got topojson")
           let topology = response.data
+          let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
+
           addMapEdgesToScene(response.data, this.scene)
+
+          makePolygons(response.data)
           // // Use topojson-client to parse the topojson into an array of multiline strings
           // // https://github.com/topojson/topojson-client
           // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
