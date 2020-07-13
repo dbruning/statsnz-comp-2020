@@ -61,60 +61,91 @@
         this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 10000);
         this.scene = new Three.Scene();
 
-        // const gridHelper = new Three.GridHelper(100, 100);
-        // gridHelper.rotateX(Math.PI / 2);
-        // this.scene.add(gridHelper);
-
-        // const mesh = new Three.Mesh(
-        //   new Three.BoxGeometry(1, 1, 1),
-        //   new Three.MeshBasicMaterial({color: 0xff0000, wireframe: true})
-        // );
-        // this.scene.add(mesh);
-
         this.chunks = [];
 
-
-        // this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(this.renderer.domElement);
 
-        container.addEventListener("click", (event) => {
-          let rect = container.getBoundingClientRect();
-
-          // container.setAttribute("style", "border: 1px solid red")
-
-          // console.log("click: ", event)
-          let mouse3D = new THREE.Vector3(
-            ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
-            -((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
-            0.1);
-
-          let raycaster = new THREE.Raycaster();
-          raycaster.setFromCamera(mouse3D, self.camera);
-
-          // console.log("areaPolygons", self.areaPolygons);
-          let intersects = raycaster.intersectObjects(self.areaPolygons);
-          if (intersects.length) {
-            var mesh = intersects[0]
-            console.log("clicked on:", mesh.object.userData.SA22018__1)
-            // mesh.object.visible = false;
-            // debugger
-            // mesh.material.color.set("blue")
-          }
-
-        }, false);
-
-
-        // let midX = 170
-        // let midY = 550
+        // container.addEventListener("mousedown", (event) => {
+        //   console.log("mousedown event", event)
+        // })
         //
-        // gridHelper.translateX(midX)
-        // gridHelper.translateY(midY)
+        // container.addEventListener("mouseup", (event) => {
+        //   console.log("mouseup event", event)
+        // })
+        //
+        // container.addEventListener("mousemove", (event) => {
+        //   console.log("mouseup event", event)
+        // })
 
-        // this.camera.up.set( 0, 1, 0 );
+
+        // https://stackoverflow.com/a/59741870/84898
+        const clickDelta = 6;
+        let startClickX;
+        let startClickY;
+
+        container.addEventListener('mousedown', function (event) {
+          startClickX = event.pageX;
+          startClickY = event.pageY;
+        });
+
+        container.addEventListener('mouseup', function (event) {
+          const diffX = Math.abs(event.pageX - startClickX);
+          const diffY = Math.abs(event.pageY - startClickY);
+
+          if (diffX < clickDelta && diffY < clickDelta) {
+
+            console.log("click event", event)
+            let rect = container.getBoundingClientRect();
+            let mouse3D = new THREE.Vector3(
+              ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
+              -((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
+              0.1);
+
+            let raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse3D, self.camera);
+
+            // console.log("areaPolygons", self.areaPolygons);
+            let intersects = raycaster.intersectObjects(self.areaPolygons);
+            if (intersects.length) {
+              var mesh = intersects[0]
+              console.log("clicked on:", mesh.object.userData.SA22018__1)
+              // mesh.object.visible = false;
+              // debugger
+              // mesh.material.color.set("blue")
+            }
+
+
+
+            // Click!
+          }
+        });
+
+        // container.addEventListener("click", (event) => {
+        //   console.log("click event", event)
+        //   let rect = container.getBoundingClientRect();
+        //   let mouse3D = new THREE.Vector3(
+        //     ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1,
+        //     -((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
+        //     0.1);
+        //
+        //   let raycaster = new THREE.Raycaster();
+        //   raycaster.setFromCamera(mouse3D, self.camera);
+        //
+        //   // console.log("areaPolygons", self.areaPolygons);
+        //   let intersects = raycaster.intersectObjects(self.areaPolygons);
+        //   if (intersects.length) {
+        //     var mesh = intersects[0]
+        //     console.log("clicked on:", mesh.object.userData.SA22018__1)
+        //     // mesh.object.visible = false;
+        //     // debugger
+        //     // mesh.material.color.set("blue")
+        //   }
+        //
+        // }, false);
+
         this.camera.position.set(0, 0, 100);
-        // this.camera.up.set(0, 1, 0);
         this.camera.lookAt(0, 0, 0);
 
         let controls = this.controls = new MapControls(this.camera, this.renderer.domElement);

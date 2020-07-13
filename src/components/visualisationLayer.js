@@ -73,11 +73,6 @@ export function addVisualisationData(scene, appState) {
       let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
       let scale = hy
 
-      // Get rid of anything "boring" - not much distance and not much volume
-      // if (hy < 50 ||row.data.Total < 180 ) {
-      //   return
-      // }
-
       // console.log("plotting row data", row.data)
       // let geometry = new Three.TorusBufferGeometry(hy/2, row.data.Total / 5000, 8, 10, Math.PI);
       let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
