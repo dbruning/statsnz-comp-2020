@@ -175,7 +175,7 @@
 
         // Run through our data to find rows (& make hoops) relating to that region
         let regionName = data.SA22018__1
-        let regionData = getRegionData(regionName, appState, self.areaPolygons)
+        let regionData = getRegionData(regionName, self.appState, self.areaPolygons)
 
         // Set appState data, for rendering on right-hand side of map
         self.appState.highlightedRegionName = regionName

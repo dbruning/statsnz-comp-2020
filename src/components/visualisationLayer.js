@@ -16,6 +16,18 @@ function getSettingsForDataset(dataset) {
   }
 }
 
+function getFullTransportModeField(fieldName, appState) {
+  if (fieldName == "at_home") {
+    if (appState.dataset == 'work') {
+      return "Work_at_home"
+    } else {
+      return "Study_at_home"
+    }
+  }
+  return fieldName
+
+}
+
 export function addVisualisationData(scene, appState) {
   let result = []
 
@@ -34,14 +46,38 @@ export function addVisualisationData(scene, appState) {
     ignoreBelowTotal = 10;
   }
 
-  let rowsProcessed = 0;
+  // Adjust what to ignore below, depending on the mode of transport
+  if (appState.transportMode == "at_home") {
+    ignoreBelowTotal *= 0.5
+  } else if (appState.transportMode == "Drive_a_private_car_truck_or_van") {
+    ignoreBelowTotal *= 0.8
+  } else if (appState.transportMode == "Drive_a_company_car_truck_or_van") {
+    ignoreBelowTotal *= 0.6
+  } else if (appState.transportMode == "Passenger_in_a_car_truck_van_or_company_bus") {
+    ignoreBelowTotal *= 0.6
+  } else if (appState.transportMode == "Public_bus") {
+    ignoreBelowTotal *= 0.6
+  } else if (appState.transportMode == "Train") {
+    ignoreBelowTotal = 0
+  } else if (appState.transportMode == "Bicycle") {
+    ignoreBelowTotal = 0
+  } else if (appState.transportMode == "Walk_or_jog") {
+    ignoreBelowTotal = 0
+  } else if (appState.transportMode == "Ferry") {
+    ignoreBelowTotal = 0
+  } else if (appState.transportMode == "Other") {
+    ignoreBelowTotal = 0
+  }
+
 
   appState.progressTask = "Loading data..."
   appState.hasLoadedVisualisation = false
   appState.isLoadingVisualisation = true
   // appState.progressPercent = 0
 
+  let rowsProcessed = 0;
   let highestRowTotal = 0;
+  let transportMode = getFullTransportModeField(appState.transportMode, appState)
 
   downloadedRows.length = 0;
   papa.parse(csv, {
@@ -49,19 +85,26 @@ export function addVisualisationData(scene, appState) {
     header: true,
     step: function (row, parser) {
       downloadedRows.push(row);
+
+      debugger
+      let count = row.data[transportMode]
+      if (count == -999 || count == 0 || count == undefined ) return;
+
       // Set the highest row total, for progress, first time through
       if (highestRowTotal == 0) {
-        highestRowTotal = row.data.Total
+        highestRowTotal = count
       }
 
       // Calculate progress
       if (rowsProcessed++ % 100 == 0) {
-        let rawFractionComplete = (highestRowTotal - row.data.Total) / (highestRowTotal - ignoreBelowTotal)
+        let rawFractionComplete = (highestRowTotal - count) / (highestRowTotal - ignoreBelowTotal)
+        console.log("rowsProcessed:", {rowsProcessed, highestRowTotal, count, ignoreBelowTotal})
+        console.log("rawFractionComplete:", rawFractionComplete)
         appState.progressPercent = Math.pow(rawFractionComplete, 3) * 100
       }
 
       // Ignore data below user-selected limit
-      if (row.data.Total < ignoreBelowTotal) {
+      if (count < ignoreBelowTotal) {
         return;
       }
 
@@ -126,18 +169,23 @@ export function getRegionData(regionName, appState, areaPolygons) {
   // Try to find a region polygon with that name
   result.areaPolygon = areaPolygons.find(p => p.userData.SA22018__1 == regionName)
 
+  let transportMode = getFullTransportModeField(appState.transportMode, appState)
+
   for (let row of downloadedRows) {
+
+    let count = row.data[transportMode]
+    if (count == -999 || count == 0) continue;
 
     // Build up results showing movement to & from the highlighted region
     if (row.data.SA2_name_usual_residence_address == regionName) {
       if (row.data[toNameField] == regionName) {
-        result.movementData.push({direction: 'within', name: row.data[toNameField], count: row.data.Total})
+        result.movementData.push({direction: 'within', name: row.data[toNameField], count: count})
       } else {
-        result.movementData.push({direction: 'to', name: row.data[toNameField], count: row.data.Total})
+        result.movementData.push({direction: 'to', name: row.data[toNameField], count: count})
       }
       result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
     } else if (row.data[toNameField] == regionName) {
-      result.movementData.push({direction: 'from', name: row.data.SA2_name_usual_residence_address, count: row.data.Total})
+      result.movementData.push({direction: 'from', name: row.data.SA2_name_usual_residence_address, count: count})
       result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
     }
 

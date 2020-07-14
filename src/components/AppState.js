@@ -1,8 +1,9 @@
 import Vue from 'vue'
 
 var sharedState = {
-    dataset: "",
+    dataset: "study",
     dataDetail: "med",
+    transportMode: "Total",
     graphicsDetail: "med",
     frameRate: 0,
     progressTask: "",
