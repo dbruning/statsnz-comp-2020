@@ -74,7 +74,7 @@
 
         this.camera.position.set(0, 0, 100);
         this.camera.lookAt(0, 0, 0);
-        this.camera.up.set(0, 1, 0);
+        this.camera.up.set(0, 0, 1);
 
         let controls = this.controls = new MapControls(this.camera, this.renderer.domElement);
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
@@ -87,11 +87,12 @@
 
         // controls.minAzimuthAngle = 0.05 * Math.PI;
         // controls.maxAzimuthAngle = 0.95 * Math.PI;
-        controls.minPolarAngle = 0.05 * Math.PI;
-        controls.maxPolarAngle = 0.95 * Math.PI;
+        // controls.minPolarAngle = 0.05 * Math.PI;
+        // controls.maxPolarAngle = 0.95 * Math.PI;
+        controls.maxPolarAngle =  Math.PI / 2;
 
         let light = new THREE.DirectionalLight(0xffffff);
-        light.position.set(0, 1, 1).normalize();
+        light.position.set(0, -1, 1).normalize();
         this.scene.add(light);
         let ambientLight = new THREE.AmbientLight(0x404040); // soft white light
         this.scene.add(ambientLight);
