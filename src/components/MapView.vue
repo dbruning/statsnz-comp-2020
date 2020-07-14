@@ -170,7 +170,6 @@
         self.appState.highlightedRegionName = ""
 
         // If it was an unclick, we're done
-        console.log("isUnclick?", isUnclick)
         if (isUnclick) return;
 
         // Run through our data to find rows (& make hoops) relating to that region

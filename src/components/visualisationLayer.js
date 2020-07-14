@@ -187,10 +187,7 @@ export function getRegionData(regionName, appState, areaPolygons) {
 
   }
 
-  // console.log(result)
-
   return result;
-
 }
 
 function getHopMesh(row, toEastingField, toNorthingField, material) {
