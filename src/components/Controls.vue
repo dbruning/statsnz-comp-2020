@@ -2,7 +2,14 @@
     <div>
         <div class="heading-and-info">
             <h3 class="heading-name">CommuterView</h3>
-            <a href="#" @click="showInfoModal"><span class="heading-info">&#x1f6c8;</span></a>
+            <a href="#" @click="showInfoModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-square" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                        <rect x="4" y="4" width="16" height="16" rx="2" />
+                        <polyline points="11 12 12 12 12 16 13 16" />
+                    </svg>
+            </a>
         </div>
         <h5>2018 Census data</h5>
 
@@ -185,11 +192,8 @@
     .heading-name {
         display: inline;
     }
-    .heading-info {
-        font-size: 1.75rem;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        line-height: 1.2;
+    .icon-tabler-info-square {
+        margin-top: 6px;
     }
 
     .load-button, .full-width {
