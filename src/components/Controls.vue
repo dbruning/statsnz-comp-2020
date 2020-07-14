@@ -1,6 +1,9 @@
 <template>
     <div>
-        <h3>CommuterView</h3>
+        <div class="heading-and-info">
+            <h3 class="heading-name">CommuterView</h3>
+            <a href="#" @click="showInfoModal"><span class="heading-info">&#x1f6c8;</span></a>
+        </div>
         <h5>2018 Census data</h5>
 
         <div v-show="!appState.isLoadingVisualisation">
@@ -66,6 +69,41 @@
             <div>{{Math.ceil(appState.progressPercent) }}%</div>
         </div>
 
+        <b-modal id="info-modal" title="There and back again." size="lg">
+            <p >
+                This app was developed for the StatsNZ "There and back again"
+                <a href="https://www.stats.govt.nz/2018-census/there-and-back-again-data-visualisation-competition/"> data visualisation competition</a>.
+                It visualises data from the 2018 NZ Census (travel for work & education) by overlaying selected data as "hops" on a map.
+                Each hop's thickness is proportional to the number of people travelling between the areas at either end of the "hop".
+            </p>
+            <p>All rights reserved, Darren Bruning, 2020</p>
+            <p>Contact: <a href="mailto:darren@bruning.net.nz">darren@bruning.net.nz</a></p>
+            <p>Source code: <a href="https://github.com/dbruning/statsnz-comp-2020">github</a></p>
+            <h5>Data sources</h5>
+            <ul>
+                <li>
+                    <a href="https://datafinder.stats.govt.nz/data/category/census/2018/commuter-view/">Work & Education datasets</a> are from statsNZ
+                </li>
+                <li>
+                    New Zealand map is <a href="https://datafinder.stats.govt.nz/layer/92212-statistical-area-2-2018-generalised/">Statistical Area 2 2018 Generalised</a>
+                    (also from statsNZ) but has been simplified for performance with <a href="https://mapshaper.org">mapshaper.org</a>
+                </li>
+            </ul>
+            <h5>Major components</h5>
+            <ul>
+                <li> <a href="https://threejs.org/">Three.js</a> for visualisation (map and hops)</li>
+                <li> <a href="https://www.papaparse.com/">Papa Parse</a> for download & parsing of csv data</li>
+                <li>
+                    <a href="https://github.com/topojson/topojson-client">topojson-client</a>
+                    and <a href="https://d3js.org/">d3.js</a> for processing of map data
+                </li>
+                <li>
+                    <a href="https://vuejs.org/">Vue.js</a>, <a href="https://bootstrap-vue.org">BootstrapVue</a> and
+                    <a href="https://getbootstrap.com/">Bootstrap</a> for application framework.
+                </li>
+            </ul>
+
+        </b-modal>
     </div>
 </template>
 
@@ -95,6 +133,10 @@
         this.appState.dataDetail = this.dataDetail
         this.appState.transportMode = this.transportMode
         this.$root.$emit('load')
+      },
+      showInfoModal() {
+        this.$bvModal.show('info-modal')
+
       }
     },
     computed: {
@@ -135,6 +177,21 @@
 </script>
 
 <style>
+    .heading-and-info {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .heading-name {
+        display: inline;
+    }
+    .heading-info {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+
     .load-button, .full-width {
         width: 100%;
     }

@@ -53,7 +53,7 @@
 <style>
     body {
         background: black;
-        color: aqua;
+        /*color: aqua;*/
     }
 
     .map-view-outer {
