@@ -153,18 +153,14 @@ export function addVisualisationData(scene, appState) {
 }
 
 export function getRegionData(regionName, appState, areaPolygons) {
-  console.log("Getting region data for region name:", regionName)
-
   let result = {
     movementData: [],
     areaPolygon: null,
     hops: []
   }
 
-  let mergedGeometry = new Three.Geometry;
-  let countMerged = 0;
 
-  let {csv, toEastingField, toNorthingField, toNameField} = getSettingsForDataset(appState.dataset)
+  let {toEastingField, toNorthingField, toNameField} = getSettingsForDataset(appState.dataset)
 
   // Try to find a region polygon with that name
   result.areaPolygon = areaPolygons.find(p => p.userData.SA22018__1 == regionName)
@@ -191,13 +187,7 @@ export function getRegionData(regionName, appState, areaPolygons) {
 
   }
 
-  console.log(result)
-  // // Add the final mesh to the scene & results
-  // let mesh = new Three.Mesh(mergedGeometry, material);
-  // scene.add(mesh);
-  // result.push(mesh)
-  //
-  // appState.progressTask = ""
+  // console.log(result)
 
   return result;
 
