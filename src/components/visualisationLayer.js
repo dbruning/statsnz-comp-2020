@@ -97,8 +97,8 @@ export function addVisualisationData(scene, appState) {
       // Calculate progress
       if (rowsProcessed++ % 100 == 0) {
         let rawFractionComplete = (highestRowTotal - count) / (highestRowTotal - ignoreBelowTotal)
-        console.log("rowsProcessed:", {rowsProcessed, highestRowTotal, count, ignoreBelowTotal})
-        console.log("rawFractionComplete:", rawFractionComplete)
+        // console.log("rowsProcessed:", {rowsProcessed, highestRowTotal, count, ignoreBelowTotal})
+        // console.log("rawFractionComplete:", rawFractionComplete)
         appState.progressPercent = Math.pow(rawFractionComplete, 3) * 100
       }
 
