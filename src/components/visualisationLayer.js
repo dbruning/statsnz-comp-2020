@@ -5,6 +5,7 @@ import {eastingToMap, northingToMap} from "./nz";
 let THREE = Three
 
 let downloadedRows = []
+let hopMaterial = new Three.MeshPhongMaterial({color: 0xffff00});
 
 function getSettingsForDataset(dataset) {
   return {
@@ -17,8 +18,6 @@ function getSettingsForDataset(dataset) {
 
 export function addVisualisationData(scene, appState) {
   let result = []
-
-  let material = new Three.MeshPhongMaterial({color: 0xffff00});
 
   let mergedGeometry = new Three.Geometry;
 
@@ -65,7 +64,7 @@ export function addVisualisationData(scene, appState) {
       }
 
       // Figure out the geometry of the hop for this row
-      let hopMesh = getHopGeometry(row, toEastingField, toNorthingField, material)
+      let hopMesh = getHopMesh(row, toEastingField, toNorthingField, hopMaterial)
 
       // Merge it into our merge geometry
       mergedGeometry.mergeMesh(hopMesh);
@@ -73,7 +72,7 @@ export function addVisualisationData(scene, appState) {
       // If we've now merged 300 geometries, add that to the scene
       if (countMerged++ > 300) {
 
-        let mesh = new Three.Mesh(mergedGeometry, material);
+        let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
         scene.add(mesh);
         result.push(mesh)
 
@@ -94,7 +93,7 @@ export function addVisualisationData(scene, appState) {
     complete: function () {
 
       // Add the final mesh to the scene & results
-      let mesh = new Three.Mesh(mergedGeometry, material);
+      let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
       scene.add(mesh);
       result.push(mesh)
 
@@ -110,10 +109,10 @@ export function getRegionData(regionName, appState, areaPolygons) {
 
   let result = {
     movementData: [],
-    areaPolygon: null
+    areaPolygon: null,
+    hops: []
   }
 
-  let material = new Three.MeshPhongMaterial({color: 0xffff00});
   let mergedGeometry = new Three.Geometry;
   let countMerged = 0;
 
@@ -127,10 +126,12 @@ export function getRegionData(regionName, appState, areaPolygons) {
     // Build up results showing movement to & from the highlighted region
     if (row.data.SA2_name_usual_residence_address == regionName) {
       result.movementData.push({to: row.data[toNameField], count: row.data.Total})
-
+      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
     } else if (row.data[toNameField] == regionName) {
       result.movementData.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
+      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
     }
+
   }
 
   console.log(result)
@@ -145,7 +146,7 @@ export function getRegionData(regionName, appState, areaPolygons) {
 
 }
 
-function getHopGeometry(row, toEastingField, toNorthingField, material) {
+function getHopMesh(row, toEastingField, toNorthingField, material) {
 
   let from = {
     x: eastingToMap(row.data.SA2_usual_residence_easting),

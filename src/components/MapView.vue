@@ -11,7 +11,7 @@
   import * as papa from 'papaparse'
 
   import appState from '@/components/AppState'
-  import { makePolygons} from "./mapPolygonsLayer";
+  import {makePolygons} from "./mapPolygonsLayer";
   import {addMapEdgesToScene} from "./mapEdgesLayer";
   import {MapControls} from "three/examples/jsm/controls/OrbitControls";
   import {addVisualisationData, getRegionData} from "./visualisationLayer";
@@ -40,6 +40,7 @@
         chunks: null,
         hasEverRendered: null,
         highlightedRegionPolygon: null,
+        highlightedRegionHops: [],
         visualisationData: []
       }
     },
@@ -112,22 +113,22 @@
       },
       getMapData() {
         axios.get("/nz_topojson_simplified.json").then(response => {
-          // console.log("got topojson")
-          // let topology = response.data
-          // let nzMesh = topojson.mesh(topology, topology.objects["statistical-area-2-2018-generalised"])
-
-
           // We keep area polygons around mainly to detect clicks with - only the edges (below) are drawn
           this.areaPolygons = makePolygons(response.data)
-          // for(let p of this.areaPolygons) {
-          //   this.scene.add(p)
-          // }
+
+          // Detect clicks on those area polygons
           detectClicks(this.renderer.domElement, this.camera, this.areaPolygons, this.$root)
 
+          // Draw the edges of the regions
           addMapEdgesToScene(response.data, this.scene)
 
         })
       },
+      setVisualisationVisibility(isVisible) {
+        for (let m of this.visualisationData) {
+          m.visible = isVisible
+        }
+      }
     },
     mounted() {
       this.init();
@@ -148,13 +149,39 @@
       })
 
 
-      this.$root.$on('regionClicked', function(data) {
+      this.$root.$on('regionClicked', function (data) {
+        let isUnclick = (self.highlightedRegionPolygon && self.highlightedRegionPolygon.userData.SA22018__1 == data.SA22018__1)
+
+        // Remove any previously-highlighted polygon & hops
+        if (self.highlightedRegionPolygon) self.scene.remove(self.highlightedRegionPolygon)
+        self.highlightedRegionPolygon = null
+        for (let hop of self.highlightedRegionHops) {
+          self.scene.remove(hop)
+        }
+        self.highlightedRegionHops.length = 0;
+
+        // Hide country-wide hops
+        self.setVisualisationVisibility(isUnclick)
+
         // self.regionName = data.SA22018__1
         let regionData = getRegionData(data.SA22018__1, appState, self.areaPolygons)
+
+        // If it was an unclick, we're done
+        if (isUnclick) return;
+
+        // Highlight the selected region as a polygon
         if (regionData.areaPolygon) {
-          if (self.highlightedRegionPolygon) self.scene.remove(self.highlightedRegionPolygon)
           self.highlightedRegionPolygon = regionData.areaPolygon
           self.scene.add(self.highlightedRegionPolygon)
+        }
+
+        // Add any hops into/out of that region
+        if (regionData.hops) {
+
+          for (let hop of regionData.hops) {
+            self.highlightedRegionHops.push(hop)
+            self.scene.add(hop)
+          }
         }
 
         // console.log("Region clicked:", data)
