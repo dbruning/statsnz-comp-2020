@@ -6,9 +6,7 @@
 
 <script>
   import * as Three from 'three'
-  // import CameraControls from 'camera-controls';
   import axios from 'axios'
-  import * as papa from 'papaparse'
 
   import appState from '@/components/AppState'
   import {makePolygons} from "./mapPolygonsLayer";
@@ -29,6 +27,7 @@
     },
     static() {
       return {
+        container: null,
         clock: null,
         camera: null,
         scene: null,
@@ -47,11 +46,16 @@
     created() {
       // Get map data as soon as created
       this.getMapData()
+      window.addEventListener("resize", this.handleWindowResize);
     },
+    destroyed() {
+      window.removeEventListener("resize", this.handleWindowResize);
+    },
+
     methods: {
       init: function () {
         let self = this
-        let container = document.getElementById('map-container');
+        let container = this.container = document.getElementById('map-container');
 
         this.mapMeshes = []
         this.areaPolygons = []
@@ -66,10 +70,8 @@
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(this.renderer.domElement);
 
-
         this.camera.position.set(0, 0, 100);
         this.camera.lookAt(0, 0, 0);
-
 
         let controls = this.controls = new MapControls(this.camera, this.renderer.domElement);
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
@@ -91,6 +93,12 @@
         let ambientLight = new THREE.AmbientLight(0x404040); // soft white light
         this.scene.add(ambientLight);
 
+      },
+      handleWindowResize(event) {
+        console.log("Window resize:", event)
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+        this.camera.updateProjectionMatrix();
       },
       animate: function () {
         // snip

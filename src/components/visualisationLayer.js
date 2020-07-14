@@ -86,7 +86,6 @@ export function addVisualisationData(scene, appState) {
     step: function (row, parser) {
       downloadedRows.push(row);
 
-      debugger
       let count = row.data[transportMode]
       if (count == -999 || count == 0 || count == undefined ) return;
 
