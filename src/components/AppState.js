@@ -6,7 +6,9 @@ var sharedState = {
     graphicsDetail: "med",
     frameRate: 0,
     progressTask: "",
-    progressPercent: 0
+    progressPercent: 0,
+    highlightedRegionName: "",
+    highlightedRegionMovementData: []
 }
 
 var tmpVm = new Vue({ data : { sharedState} });

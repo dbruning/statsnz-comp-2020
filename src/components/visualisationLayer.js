@@ -125,10 +125,10 @@ export function getRegionData(regionName, appState, areaPolygons) {
 
     // Build up results showing movement to & from the highlighted region
     if (row.data.SA2_name_usual_residence_address == regionName) {
-      result.movementData.push({to: row.data[toNameField], count: row.data.Total})
+      result.movementData.push({direction: 'to', name: row.data[toNameField], count: row.data.Total})
       result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
     } else if (row.data[toNameField] == regionName) {
-      result.movementData.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
+      result.movementData.push({direction: 'from', name: row.data.SA2_name_usual_residence_address, count: row.data.Total})
       result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
     }
 

@@ -150,7 +150,12 @@
 
 
       this.$root.$on('regionClicked', function (data) {
-        let isUnclick = (self.highlightedRegionPolygon && self.highlightedRegionPolygon.userData.SA22018__1 == data.SA22018__1)
+        let isUnclick = false
+        if (self.highlightedRegionPolygon != null) {
+          if (self.highlightedRegionPolygon.userData.SA22018__1 == data.SA22018__1) {
+            isUnclick = true
+          }
+        }
 
         // Remove any previously-highlighted polygon & hops
         if (self.highlightedRegionPolygon) self.scene.remove(self.highlightedRegionPolygon)
@@ -162,12 +167,19 @@
 
         // Hide country-wide hops
         self.setVisualisationVisibility(isUnclick)
-
-        // self.regionName = data.SA22018__1
-        let regionData = getRegionData(data.SA22018__1, appState, self.areaPolygons)
+        self.appState.highlightedRegionName = ""
 
         // If it was an unclick, we're done
+        console.log("isUnclick?", isUnclick)
         if (isUnclick) return;
+
+        // Run through our data to find rows (& make hoops) relating to that region
+        let regionName = data.SA22018__1
+        let regionData = getRegionData(regionName, appState, self.areaPolygons)
+
+        // Set appState data, for rendering on right-hand side of map
+        self.appState.highlightedRegionName = regionName
+        self.appState.highlightedRegionMovementData = regionData.movementData
 
         // Highlight the selected region as a polygon
         if (regionData.areaPolygon) {
