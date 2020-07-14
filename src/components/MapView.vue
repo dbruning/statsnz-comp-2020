@@ -74,6 +74,7 @@
 
         this.camera.position.set(0, 0, 100);
         this.camera.lookAt(0, 0, 0);
+        this.camera.up.set(0, 1, 0);
 
         let controls = this.controls = new MapControls(this.camera, this.renderer.domElement);
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
@@ -122,15 +123,14 @@
       animate: function () {
         // snip
         const delta = this.clock.getDelta();
-        // console.log(delta)
-        // const hasControlsUpdated = this.controls.update(delta);
-        this.controls.update()
 
         if (delta > 0) {
           this.appState.frameRate = (this.appState.frameRate * 10 + (1 / delta)) / 11
         }
 
         requestAnimationFrame(this.animate);
+
+        this.controls.update()
 
         // for(let hoop of this.hoops) {
         //   hoop.geometry.rotateY(delta)
