@@ -7,6 +7,9 @@ var sharedState = {
     frameRate: 0,
     progressTask: "",
     progressPercent: 0,
+    canLoad: false,
+    hasLoadedVisualisation: false,
+    isLoadingVisualisation: false,
     highlightedRegionName: "",
     highlightedRegionMovementData: []
 }

@@ -15,7 +15,7 @@
                 <b-col cols="12" md="3" class="control-column">
                     <Controls></Controls>
                     <RegionDetail></RegionDetail>
-                    <PerfStats></PerfStats>
+                    <!--<PerfStats></PerfStats>-->
                 </b-col>
             </b-row>
         </b-container>
@@ -43,7 +43,9 @@
   export default {
     name: 'App',
     components: {
-      MapView, Controls, PerfStats, RegionDetail
+      MapView, Controls,
+      // PerfStats,
+      RegionDetail
     }
   }
 </script>

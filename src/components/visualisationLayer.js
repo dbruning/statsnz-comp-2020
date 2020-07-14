@@ -37,6 +37,8 @@ export function addVisualisationData(scene, appState) {
   let rowsProcessed = 0;
 
   appState.progressTask = "Loading data..."
+  appState.hasLoadedVisualisation = false
+  appState.isLoadingVisualisation = true
   // appState.progressPercent = 0
 
   let highestRowTotal = 0;
@@ -98,6 +100,9 @@ export function addVisualisationData(scene, appState) {
       result.push(mesh)
 
       appState.progressTask = ""
+
+      appState.hasLoadedVisualisation = true
+      appState.isLoadingVisualisation = false
     }
   });
 
