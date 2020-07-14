@@ -122,30 +122,24 @@ export function getRegionData(regionName, appState, areaPolygons) {
   // Try to find a region polygon with that name
   result.areaPolygon = areaPolygons.find(p => p.userData.SA22018__1 == regionName)
 
-  papa.parse(csv, {
-    download: true,
-    header: true,
-    step: function (row, parser) {
+  for (let row of downloadedRows) {
 
-      // Build up results showing movement to & from the highlighted region
-      if (row.data.SA2_name_usual_residence_address == regionName) {
-        result.movementData.push({to: row.data[toNameField], count: row.data.Total})
+    // Build up results showing movement to & from the highlighted region
+    if (row.data.SA2_name_usual_residence_address == regionName) {
+      result.movementData.push({to: row.data[toNameField], count: row.data.Total})
 
-      } else if (row.data[toNameField] == regionName) {
-        result.movementData.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
-      }
-    },
-    complete: function () {
-
-      console.log(result)
-      // // Add the final mesh to the scene & results
-      // let mesh = new Three.Mesh(mergedGeometry, material);
-      // scene.add(mesh);
-      // result.push(mesh)
-      //
-      // appState.progressTask = ""
+    } else if (row.data[toNameField] == regionName) {
+      result.movementData.push({from: row.data.SA2_name_usual_residence_address, count: row.data.Total})
     }
-  });
+  }
+
+  console.log(result)
+  // // Add the final mesh to the scene & results
+  // let mesh = new Three.Mesh(mergedGeometry, material);
+  // scene.add(mesh);
+  // result.push(mesh)
+  //
+  // appState.progressTask = ""
 
   return result;
 

@@ -80,12 +80,12 @@ export function makePolygons(topoJsonData) {
 
       // console.log("part has sets of coordinates:", part.coordinates.length)
       // for (const coordinateSet of part.coordinates) {
-        for (const point of part) {
-          // console.log("point:", point[0], point[1])
-          let vector = nzgdToVector2(point);
-          // console.log("vector:", vector)
-          points.push(vector);
-        }
+      for (const point of part) {
+        // console.log("point:", point[0], point[1])
+        let vector = nzgdToVector2(point);
+        // console.log("vector:", vector)
+        points.push(vector);
+      }
 
       // }
 
@@ -93,42 +93,25 @@ export function makePolygons(topoJsonData) {
 
       // console.log("shape", shape)
 
-      for(let hole of holes) {
+      for (let hole of holes) {
         // const hole = coordinate[1];
         // if (hole) {
-          const path = new THREE.Path();
-          for (let i = 0; i < hole.length; i++) {
-            const point = hole[i];
-            if (i === 0) {
-              path.moveTo(eastingToMap(point[0]), northingToMap(point[1])) ;
-            } else {
-              path.lineTo(eastingToMap(point[0]), northingToMap(point[1])) ;
-            }
+        const path = new THREE.Path();
+        for (let i = 0; i < hole.length; i++) {
+          const point = hole[i];
+          if (i === 0) {
+            path.moveTo(eastingToMap(point[0]), northingToMap(point[1]));
+          } else {
+            path.lineTo(eastingToMap(point[0]), northingToMap(point[1]));
           }
-          shape.holes.push(path);
         }
-      // }
-
-      // hole
-      // const hole = coordinate[1];
-      // if (hole) {
-      //   const path = new THREE.Path();
-      //   for (let i = 0; i < hole.length; i++) {
-      //     const point = hole[i];
-      //     if (i === 0) {
-      //       path.moveTo(point[0] / 10000, point[1] / 10000);
-      //     } else {
-      //       path.lineTo(point[0] / 10000, point[1] / 10000);
-      //     }
-      //   }
-      //   shape.holes.push(path);
-      // }
-      // shapes.push(shape);
+        shape.holes.push(path);
+      }
       let geometry = new THREE.ShapeBufferGeometry(shape)
       geometry.computeBoundingSphere();
       geometry.computeBoundingBox();
 
-      let material = new Three.MeshBasicMaterial({color: 0xffff00});
+      let material = new Three.MeshBasicMaterial({color: 0x42b983});
       let mesh = new THREE.Mesh(geometry, material)
 
       mesh.userData = feature.properties;
