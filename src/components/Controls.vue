@@ -2,41 +2,64 @@
     <div>
         <h3>CommuterView</h3>
         <h5>2018 Census data</h5>
-        <b-form-group label="Dataset:">
-            <b-form-radio-group buttons button-variant="outline-primary" size="sm" class="full-width">
-                <b-form-radio v-model="dataset" name="dataset" value="work">Work</b-form-radio>
-                <b-form-radio v-model="dataset" name="dataset" value="study">Study</b-form-radio>
-            </b-form-radio-group>
-        </b-form-group>
 
-        <b-form-group label="Data detail:">
-            <b-form-radio-group buttons button-variant="outline-primary" size="sm" class="full-width">
-                <b-form-radio v-model="dataDetail" name="dataset" value="low">Low</b-form-radio>
-                <b-form-radio v-model="dataDetail" name="dataset" value="med">Med</b-form-radio>
-                <b-form-radio v-model="dataDetail" name="dataset" value="high">High</b-form-radio>
-            </b-form-radio-group>
-        </b-form-group>
+        <div v-show="!appState.isLoadingVisualisation">
 
-        <b-form-group label="Mode of transport:">
-            <b-form-select v-model="transportMode" class="mb-3" plain>
-                <!--<b-form-select-option :value="null">Please select an option</b-form-select-option>-->
-                <b-form-select-option value="at_home">At home</b-form-select-option>
-                <b-form-select-option value="Drive_a_private_car_truck_or_van" >Drive private car/truck/van</b-form-select-option>
-                <b-form-select-option value="Drive_a_company_car_truck_or_van" >Drive company car/truck/van</b-form-select-option>
-                <b-form-select-option value="Passenger_in_a_car_truck_van_or_company_bus">Passenger in car/truck/van/co.bus</b-form-select-option>
-                <b-form-select-option value="Public_bus">Public bus</b-form-select-option>
-                <b-form-select-option value="Train">Train</b-form-select-option>
-                <b-form-select-option value="Bicycle">Bicycle</b-form-select-option>
-                <b-form-select-option value="Walk_or_jog">Walk or jog</b-form-select-option>
-                <b-form-select-option value="Ferry">Ferry</b-form-select-option>
-                <b-form-select-option value="Total">(Any)</b-form-select-option>
-            </b-form-select>
+            <b-form-group label="Dataset:">
+                <b-form-radio-group buttons button-variant="outline-primary" size="sm" class="full-width">
+                    <b-form-radio v-model="dataset" name="dataset" value="work">Work</b-form-radio>
+                    <b-form-radio v-model="dataset" name="dataset" value="study">Study</b-form-radio>
+                </b-form-radio-group>
+            </b-form-group>
 
-        </b-form-group>
+            <b-form-group label="Data detail:">
+                <b-form-radio-group buttons button-variant="outline-primary" size="sm" class="full-width">
+                    <b-form-radio v-model="dataDetail" name="dataset" value="low">Low</b-form-radio>
+                    <b-form-radio v-model="dataDetail" name="dataset" value="med">Med</b-form-radio>
+                    <b-form-radio v-model="dataDetail" name="dataset" value="high">High</b-form-radio>
+                </b-form-radio-group>
+            </b-form-group>
 
-        <b-btn variant="primary" class="load-button" @click="loadClicked"
-               v-if="canLoad && !appState.isLoadingVisualisation">Load
-        </b-btn>
+            <b-form-group label="Mode of transport:">
+                <b-form-select v-model="transportMode" class="mb-3" plain v-if="dataset=='work'">
+                    <!--<b-form-select-option :value="null">Please select an option</b-form-select-option>-->
+                    <b-form-select-option value="Work_at_home">Work at home</b-form-select-option>
+                    <b-form-select-option value="Drive_a_private_car_truck_or_van">Drive private car/truck/van
+                    </b-form-select-option>
+                    <b-form-select-option value="Drive_a_company_car_truck_or_van">Drive company car/truck/van
+                    </b-form-select-option>
+                    <b-form-select-option value="Passenger_in_a_car_truck_van_or_company_bus">Passenger in
+                        car/truck/van/co.bus
+                    </b-form-select-option>
+                    <b-form-select-option value="Public_bus">Public bus</b-form-select-option>
+                    <b-form-select-option value="Train">Train</b-form-select-option>
+                    <b-form-select-option value="Bicycle">Bicycle</b-form-select-option>
+                    <b-form-select-option value="Walk_or_jog">Walk or jog</b-form-select-option>
+                    <b-form-select-option value="Ferry">Ferry</b-form-select-option>
+                    <b-form-select-option value="Total">(Any)</b-form-select-option>
+                </b-form-select>
+
+                <b-form-select v-model="transportMode" class="mb-3" plain v-if="dataset=='study'">
+                    <!--<b-form-select-option :value="null">Please select an option</b-form-select-option>-->
+                    <b-form-select-option value="Work_at_home">Study at home</b-form-select-option>
+                    <b-form-select-option value="Drive_a_car_truck_or_van">Drive a car/truck/van</b-form-select-option>
+                    <b-form-select-option value="Drive_a_company_car_truck_or_van">Drive company car/truck/van
+                    </b-form-select-option>
+                    <b-form-select-option value="Passenger_in_a_car_truck_or_van">Passenger in car/truck/van
+                    </b-form-select-option>
+                    <b-form-select-option value="Public_bus">Public bus</b-form-select-option>
+                    <b-form-select-option value="Train">Train</b-form-select-option>
+                    <b-form-select-option value="Bicycle">Bicycle</b-form-select-option>
+                    <b-form-select-option value="Walk_or_jog">Walk or jog</b-form-select-option>
+                    <b-form-select-option value="Ferry">Ferry</b-form-select-option>
+                    <b-form-select-option value="Total">(Any)</b-form-select-option>
+                </b-form-select>
+            </b-form-group>
+
+            <b-btn variant="primary" class="load-button" @click="loadClicked"
+                   v-if="canLoad && !appState.isLoadingVisualisation">Load
+            </b-btn>
+        </div>
 
         <div class="progress-line" v-if="appState.progressTask.length">
             <div>{{appState.progressTask}}</div>
