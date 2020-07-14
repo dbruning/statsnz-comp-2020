@@ -2,6 +2,16 @@
     <div v-if="appState.highlightedRegionName.length">
         {{appState.highlightedRegionName}}:
         <table>
+            <tr v-for="(movement, index) in withinMovements" :key="index">
+                <td class="name">
+                    {{movement.direction}} {{movement.name}}
+                </td>
+                <td class="count">
+                    {{movement.count}}
+                </td>
+            </tr>
+        </table>
+        <table>
             <tr v-for="(movement, index) in fromMovements" :key="index">
                 <td class="name">
                     {{movement.direction}} {{movement.name}}
@@ -45,24 +55,11 @@
       // }
     },
     computed: {
-      sortedMovements: function() {
-        return this.appState.highlightedRegionMovementData
-          // Avoid side effect
-          .slice()
-          .sort((a, b) => {
-            let countDiff = (a.count - b.count)
-            if (a.direction == "from" && b.direction == "to") return -2
-            if (a.direction == "to" && b.direction == "from") return 2
-            if (a.count > b.count) return -1
-            if (a.count < b.count) return 1
-            return 0
-          })
+      withinMovements: function() {
+        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="within")
       },
       fromMovements: function() {
-        return this.appState.highlightedRegionMovementData
-          .slice()
-          .filter(m => m.direction=="from")
-        // .sort((a, b) => b.count - a.count)
+        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="from")
       },
       toMovements: function() {
         return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="to")

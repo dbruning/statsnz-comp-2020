@@ -73,9 +73,9 @@
     }
 
     .control-column {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        /*display: flex;*/
+        /*flex-direction: column;*/
+        /*justify-content: space-between;*/
 
     }
 </style>

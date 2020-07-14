@@ -2,7 +2,7 @@
     <div>
         <h3>CommuterView</h3>
         <h5>2018 Census data</h5>
-        <b-form-group label="Dataset:" >
+        <b-form-group label="Dataset:">
             <b-form-radio-group buttons button-variant="outline-primary" size="sm" class="full-width">
                 <b-form-radio v-model="dataset" name="dataset" value="work">Work</b-form-radio>
                 <b-form-radio v-model="dataset" name="dataset" value="study">Study</b-form-radio>
@@ -25,7 +25,9 @@
         <!--    </b-form-radio-group>-->
         <!--</b-form-group>-->
 
-        <b-btn variant="primary" class="load-button" @click="loadClicked" v-if="canLoad && !appState.isLoadingVisualisation">Load</b-btn>
+        <b-btn variant="primary" class="load-button" @click="loadClicked"
+               v-if="canLoad && !appState.isLoadingVisualisation">Load
+        </b-btn>
 
         <!--<b-progress max="100" v-if="appState.progressTask.length" variant="primary">-->
         <!--    <b-progress-bar :value="appState.progressPercent" :label="`${appState.progressTask}%`"></b-progress-bar>-->
@@ -60,11 +62,36 @@
     },
     methods: {
       loadClicked() {
+        // Copy the settings into the app state
+        this.appState.dataset = this.dataset
+        this.appState.dataDetai = this.dataDetail
         this.$root.$emit('load')
       }
     },
     computed: {
-      canLoad: function() {return (this.dataset != null) && (this.dataDetail != null)}
+      canLoad: function () {
+        // If user hasn't specified dataset or dataDetail level, we can't load yet
+        if (this.dataset == null || this.dataDetail == null) {
+          return false;
+        }
+
+        // If we're currently loading, then we can't load
+        if (this.appState.isLoadingVisualisation) {
+          return false
+        }
+
+        // // If we haven't yet loaded, and we're otherwise OK, then we can load
+        // if (!this.appState.hasLoadedVisualisation && !this.appState.isLoadingVisualisation) {
+        //   return true;
+        // }
+
+        // Otherwise, we can load IF the current settings are different to the ones we loaded.
+        if (this.appState.dataset != this.dataset || this.appState.dataDetail != this.dataDetail) {
+          return true
+        }
+
+        return false;
+      }
     },
     mounted() {
       let self = this;
@@ -76,6 +103,7 @@
     .load-button, .full-width {
         width: 100%;
     }
+
     .progress-line {
         display: flex;
         flex-direction: row;
