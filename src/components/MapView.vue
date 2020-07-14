@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div id="map-container" style="height:600px"></div>
+        <!--<div id="map-container" style="height:600px"></div>-->
+        <div id="map-container"></div>
     </div>
 </template>
 
@@ -60,14 +61,15 @@
         this.mapMeshes = []
         this.areaPolygons = []
 
+        let height = this.calculateIdealMapHeight()
         this.clock = new Three.Clock();
-        this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 10000);
+        this.camera = new Three.PerspectiveCamera(70, container.clientWidth / height, 0.01, 10000);
         this.scene = new Three.Scene();
 
         this.chunks = [];
 
         this.renderer = new Three.WebGLRenderer({antialias: true});
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setSize(container.clientWidth, height);
         container.appendChild(this.renderer.domElement);
 
         this.camera.position.set(0, 0, 100);
@@ -96,9 +98,26 @@
       },
       handleWindowResize(event) {
         console.log("Window resize:", event)
-        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+        let height = this.calculateIdealMapHeight()
+        this.renderer.setSize(this.container.clientWidth, height);
+        this.camera.aspect = this.container.clientWidth / height;
         this.camera.updateProjectionMatrix();
+      },
+      calculateIdealMapHeight() {
+        let mapViewElement = document.querySelector(".map-view")
+        let controlColumnElement = document.querySelector(".control-column")
+        let mapViewBox = mapViewElement.getBoundingClientRect();
+        let controlColumnBox = controlColumnElement.getBoundingClientRect();
+
+        if (controlColumnBox.left > mapViewBox.right)  {
+          // Control column is on right-hand side of map - map height can be pretty much full screen
+          return window.innerHeight - (2 * 16);
+        } else {
+          // Control column is down below (e.g. on a phone)
+          // - map height is less, make sure user can see some of the heading & grab it to scroll down
+          return window.innerHeight - 80;
+        }
+
       },
       animate: function () {
         // snip
