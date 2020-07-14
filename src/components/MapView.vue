@@ -80,7 +80,7 @@
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
         controls.dampingFactor = 0.05;
 
-        controls.screenSpacePanning = true;
+        controls.screenSpacePanning = false;
 
         controls.minDistance = 1;
         controls.maxDistance = 500;
