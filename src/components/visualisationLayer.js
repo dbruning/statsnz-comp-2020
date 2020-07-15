@@ -13,6 +13,13 @@ function getDownloadedRows(appState) {
 
 let hopMaterial = new Three.MeshPhongMaterial({color: 0xffff00});
 
+// Different colors for "in" and "out" hops - chosen because they're light (against a dark background)
+// and blue/orange should be easily distinguishable for colorblind people.
+// (they're spinning anyway, so that should help too, and also listed in a table on the side so color is not
+//  the only distinguisher here)
+let inHopMaterial = new Three.MeshPhongMaterial({color: 0xff4d4f}); // red
+let outHopMaterial = new Three.MeshPhongMaterial({color: 0x4309e3}); // blue
+
 function getSettingsForDataset(dataset) {
   return {
     csv: (dataset == 'work') ? '/work.csv' : '/education.csv',
@@ -233,11 +240,11 @@ export function getRegionData(regionName, appState, areaPolygons) {
         result.movementData.push({direction: 'within', name: row.data[toNameField], count: count})
       } else {
         result.movementData.push({direction: 'to', name: row.data[toNameField], count: count})
-        result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial, false))
+        result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, outHopMaterial, false))
       }
     } else if (row.data[toNameField] == regionName) {
       result.movementData.push({direction: 'from', name: row.data.SA2_name_usual_residence_address, count: count})
-      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial, false))
+      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, inHopMaterial, false))
     }
 
   }
