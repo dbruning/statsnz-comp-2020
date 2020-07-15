@@ -111,7 +111,7 @@ export function addVisualisationData(scene, appState, progressCallback) {
     }
 
     // Figure out the geometry of the hop for this row
-    let hopMesh = getHopMesh(row, toEastingField, toNorthingField, hopMaterial)
+    let hopMesh = getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial)
 
     // Merge it into our merge geometry
     mergedGeometry.mergeMesh(hopMesh);
@@ -233,10 +233,10 @@ export function getRegionData(regionName, appState, areaPolygons) {
       } else {
         result.movementData.push({direction: 'to', name: row.data[toNameField], count: count})
       }
-      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
+      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial))
     } else if (row.data[toNameField] == regionName) {
       result.movementData.push({direction: 'from', name: row.data.SA2_name_usual_residence_address, count: count})
-      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, hopMaterial))
+      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial))
     }
 
   }
@@ -244,7 +244,7 @@ export function getRegionData(regionName, appState, areaPolygons) {
   return result;
 }
 
-function getHopMesh(row, toEastingField, toNorthingField, material) {
+function getHopMesh(row, toEastingField, toNorthingField, transportMode, material) {
 
   let from = {
     x: eastingToMap(row.data.SA2_usual_residence_easting),
@@ -262,9 +262,10 @@ function getHopMesh(row, toEastingField, toNorthingField, material) {
   let op = from.y - to.y;
   let ad = from.x - to.x;
   let theta = Math.atan(op / ad);
-  let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2)) * 1
-
-  let geometry = new Three.TorusGeometry(hy / 2, row.data.Total / 5000, 8, 10, Math.PI);
+  let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2))
+  let radius = hy / 2
+  let tubeDiameter = row.data[transportMode] / 5000;
+  let geometry = new Three.TorusGeometry(radius, tubeDiameter, 8, 10, Math.PI);
   geometry.rotateX(Math.PI / 2)
 
   let mesh = new Three.Mesh(geometry, material);
