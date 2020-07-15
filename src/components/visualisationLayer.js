@@ -39,7 +39,7 @@ export function addVisualisationData(scene, appState, addedMeshes, progressCallb
 
   let countMerged = 0;
 
-  let {csv, toEastingField, toNorthingField} = getSettingsForDataset(appState.dataset)
+  let {csv, toEastingField, toNorthingField, toNameField} = getSettingsForDataset(appState.dataset)
 
   let ignoreBelowTotal = 50;
   if (appState.dataDetail == "low") {
@@ -108,8 +108,13 @@ export function addVisualisationData(scene, appState, addedMeshes, progressCallb
       return;
     }
 
+    // If it's from and to the same place, skip
+    if (row.data[toNameField] === row.data.SA2_name_usual_residence_address) {
+      return
+    }
+
     // Figure out the geometry of the hop for this row
-    let hopMesh = getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial)
+    let hopMesh = getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial, true)
 
     // Merge it into our merge geometry
     mergedGeometry.mergeMesh(hopMesh);
@@ -228,11 +233,11 @@ export function getRegionData(regionName, appState, areaPolygons) {
         result.movementData.push({direction: 'within', name: row.data[toNameField], count: count})
       } else {
         result.movementData.push({direction: 'to', name: row.data[toNameField], count: count})
+        result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial, false))
       }
-      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial))
     } else if (row.data[toNameField] == regionName) {
       result.movementData.push({direction: 'from', name: row.data.SA2_name_usual_residence_address, count: count})
-      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial))
+      result.hops.push(getHopMesh(row, toEastingField, toNorthingField, transportMode, hopMaterial, false))
     }
 
   }
@@ -240,7 +245,7 @@ export function getRegionData(regionName, appState, areaPolygons) {
   return result;
 }
 
-function getHopMesh(row, toEastingField, toNorthingField, transportMode, material) {
+function getHopMesh(row, toEastingField, toNorthingField, transportMode, material, topHalf) {
 
   let from = {
     x: eastingToMap(row.data.SA2_usual_residence_easting),
@@ -255,18 +260,23 @@ function getHopMesh(row, toEastingField, toNorthingField, transportMode, materia
     y: (from.y + to.y) / 2
   }
 
-  let op = from.y - to.y;
-  let ad = from.x - to.x;
-  let theta = Math.atan(op / ad);
+  let op = to.y - from.y;
+  let ad = to.x - from.x;
+  let oldTheta = Math.atan(op / ad);
+  let theta = Math.atan2(op , ad);
+  console.log("thetas", {oldTheta, theta})
   let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2))
   let radius = hy / 2
   let tubeDiameter = row.data[transportMode] / 5000;
-  let geometry = new Three.TorusGeometry(radius, tubeDiameter, 8, 10, Math.PI);
+  let arc = (topHalf)? Math.Pi : 2 * Math.Pi;
+  let geometry = new Three.TorusGeometry(radius, tubeDiameter, 8, 10, arc);
   geometry.rotateX(Math.PI / 2)
 
   let mesh = new Three.Mesh(geometry, material);
 
+   // mesh.rotateZ(-1.5)
   mesh.rotateZ(theta)
+  // mesh.rotateZ(oldTheta)
 
   mesh.position.x = midpoint.x
   mesh.position.y = midpoint.y

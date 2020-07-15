@@ -68,8 +68,11 @@
 
         this.chunks = [];
 
+        let globalPlane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0.01 );
+
         this.renderer = new Three.WebGLRenderer({antialias: true});
         this.renderer.setSize(container.clientWidth, height);
+        this.renderer.clippingPlanes = [globalPlane]
         container.appendChild(this.renderer.domElement);
 
         this.camera.position.set(0, 0, 100);
@@ -127,6 +130,12 @@
 
         if (delta > 0) {
           this.appState.frameRate = (this.appState.frameRate * 10 + (1 / delta)) / 11
+        }
+
+        if (this.highlightedRegionPolygon != null) {
+          for(let m of this.highlightedRegionHops) {
+            m.geometry.rotateY(delta)
+          }
         }
 
         requestAnimationFrame(this.animate);
