@@ -173,7 +173,11 @@
         }
 
         // Add new visualisation data
-        self.visualisationData = addVisualisationData(self.scene, self.appState)
+        self.visualisationData = addVisualisationData(self.scene, self.appState, function() {
+          // Render on each progress callback
+          // console.log("progressCallback, going to render")
+          self.renderer.render(self.scene, self.camera);
+        })
       })
 
 

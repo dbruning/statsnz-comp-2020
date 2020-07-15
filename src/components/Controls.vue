@@ -53,8 +53,6 @@
                     <!--<b-form-select-option :value="null">Please select an option</b-form-select-option>-->
                     <b-form-select-option value="Work_at_home">Study at home</b-form-select-option>
                     <b-form-select-option value="Drive_a_car_truck_or_van">Drive a car/truck/van</b-form-select-option>
-                    <b-form-select-option value="Drive_a_company_car_truck_or_van">Drive company car/truck/van
-                    </b-form-select-option>
                     <b-form-select-option value="Passenger_in_a_car_truck_or_van">Passenger in car/truck/van
                     </b-form-select-option>
                     <b-form-select-option value="Public_bus">Public bus</b-form-select-option>

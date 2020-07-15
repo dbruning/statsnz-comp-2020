@@ -4,7 +4,13 @@ import {eastingToMap, northingToMap} from "./nz";
 
 let THREE = Three
 
-let downloadedRows = []
+let downloadedWorkRows = []
+let downloadedStudyRows = []
+
+function getDownloadedRows(appState) {
+  return (appState.dataset == 'work') ? downloadedWorkRows : downloadedStudyRows
+}
+
 let hopMaterial = new Three.MeshPhongMaterial({color: 0xffff00});
 
 function getSettingsForDataset(dataset) {
@@ -28,7 +34,7 @@ function getFullTransportModeField(fieldName, appState) {
 
 }
 
-export function addVisualisationData(scene, appState) {
+export function addVisualisationData(scene, appState, progressCallback) {
   let result = []
 
   let mergedGeometry = new Three.Geometry;
@@ -79,74 +85,123 @@ export function addVisualisationData(scene, appState) {
   let highestRowTotal = 0;
   let transportMode = getFullTransportModeField(appState.transportMode, appState)
 
-  downloadedRows.length = 0;
-  papa.parse(csv, {
-    download: true,
-    header: true,
-    step: function (row, parser) {
-      downloadedRows.push(row);
+  let downloadedRows = getDownloadedRows(appState)
 
-      let count = row.data[transportMode]
-      if (count == -999 || count == 0 || count == undefined ) return;
+  // Function to define what we'll do with each row, regardless of whether we're streaming & parsing, or looping over already-downloaded rows
+  function processRow(row, batchCallback) {
+    let count = row.data[transportMode]
+    if (count == -999 || count == 0 || count == undefined) return;
 
-      // Set the highest row total, for progress, first time through
-      if (highestRowTotal == 0) {
-        highestRowTotal = count
-      }
+    // Set the highest row total, for progress, first time through
+    if (highestRowTotal == 0) {
+      highestRowTotal = count
+    }
 
-      // Calculate progress
-      if (rowsProcessed++ % 100 == 0) {
-        let rawFractionComplete = (highestRowTotal - count) / (highestRowTotal - ignoreBelowTotal)
-        // console.log("rowsProcessed:", {rowsProcessed, highestRowTotal, count, ignoreBelowTotal})
-        // console.log("rawFractionComplete:", rawFractionComplete)
-        appState.progressPercent = Math.pow(rawFractionComplete, 3) * 100
-      }
+    // Calculate progress
+    if (rowsProcessed++ % 100 == 0) {
+      let rawFractionComplete = (highestRowTotal - count) / (highestRowTotal - ignoreBelowTotal)
+      // console.log("rowsProcessed:", {rowsProcessed, highestRowTotal, count, ignoreBelowTotal})
+      // console.log("rawFractionComplete:", rawFractionComplete)
+      appState.progressPercent = Math.pow(rawFractionComplete, 3) * 100
+    }
 
-      // Ignore data below user-selected limit
-      if (count < ignoreBelowTotal) {
-        return;
-      }
+    // Ignore data below user-selected limit
+    if (count < ignoreBelowTotal) {
+      return;
+    }
 
-      // Figure out the geometry of the hop for this row
-      let hopMesh = getHopMesh(row, toEastingField, toNorthingField, hopMaterial)
+    // Figure out the geometry of the hop for this row
+    let hopMesh = getHopMesh(row, toEastingField, toNorthingField, hopMaterial)
 
-      // Merge it into our merge geometry
-      mergedGeometry.mergeMesh(hopMesh);
+    // Merge it into our merge geometry
+    mergedGeometry.mergeMesh(hopMesh);
 
-      // If we've now merged 300 geometries, add that to the scene
-      if (countMerged++ > 300) {
+    // If we've now merged 300 geometries, add that to the scene
+    if (countMerged++ > 300) {
 
-        let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
-        scene.add(mesh);
-        result.push(mesh)
-
-        mergedGeometry = new Three.Geometry;
-        countMerged = 0;
-
-        // Have a wee lie down, so the renderer can have a chance to render.
-        if (!parser.paused()) {
-          parser.pause()
-        }
-        setTimeout(function () {
-          // results = null
-          if (parser.paused())
-            parser.resume()
-        }, 100)
-      }
-    },
-    complete: function () {
-
-      // Add the final mesh to the scene & results
       let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
       scene.add(mesh);
       result.push(mesh)
 
-      appState.progressTask = ""
+      mergedGeometry = new Three.Geometry;
+      countMerged = 0;
 
-      appState.hasLoadedVisualisation = true
-      appState.isLoadingVisualisation = false
+      // console.log("ProcessRow, maybe going to call batchCallback", batchCallback)
+      if (batchCallback && typeof (batchCallback) === 'function') {
+        batchCallback()
+      }
     }
-  });
+  }
+
+  function allRowsCompleted() {
+    // Add the final mesh to the scene & results
+    let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
+    scene.add(mesh);
+    result.push(mesh)
+
+    appState.progressTask = ""
+
+    appState.hasLoadedVisualisation = true
+    appState.isLoadingVisualisation = false
+  }
+
+
+  // If we've already got downloaded rows, just run through them in a simple loop
+  if (downloadedRows.length) {
+    let rowIndex = -1;
+    let isPaused = false
+    let resume = function() {
+      while (!isPaused) {
+        rowIndex++;
+
+        // If we've processed all rows, run the completion function and exit
+        if (rowIndex >= downloadedRows.length) {
+          allRowsCompleted()
+          return
+        }
+
+        // If we haven't yet processed all rows, process the next one
+        if (rowIndex > downloadedRows.length || isPaused) return;
+        processRow(downloadedRows[rowIndex], function() {
+          // If this is the end of a batch, pause for a bit to let the paint happen
+          isPaused = true;
+          setTimeout(function () {
+            // After 100ms pause, unpause and continue
+            isPaused = false;
+            resume()
+          }, 100)
+        })
+
+      }
+    }
+    resume()
+
+  } else {
+    papa.parse(csv, {
+      download: true,
+      header: true,
+      step: function (row, parser) {
+        downloadedRows.push(row);
+        processRow(row, function () {
+          // After every batch, have a wee lie down, so the renderer can have a chance to render.
+          if (!parser.paused()) {
+            parser.pause()
+          }
+          setTimeout(function () {
+            // results = null
+            if (parser.paused())
+              parser.resume()
+          }, 100)
+          if (progressCallback && typeof(progressCallback) == 'function') {
+            progressCallback()
+          }
+        })
+      },
+      complete: function () {
+        allRowsCompleted()
+      }
+    })
+  }
 
   return result;
 }
@@ -158,7 +213,6 @@ export function getRegionData(regionName, appState, areaPolygons) {
     hops: []
   }
 
-
   let {toEastingField, toNorthingField, toNameField} = getSettingsForDataset(appState.dataset)
 
   // Try to find a region polygon with that name
@@ -166,6 +220,7 @@ export function getRegionData(regionName, appState, areaPolygons) {
 
   let transportMode = getFullTransportModeField(appState.transportMode, appState)
 
+  let downloadedRows = getDownloadedRows(appState)
   for (let row of downloadedRows) {
 
     let count = row.data[transportMode]
