@@ -40,6 +40,10 @@
 <script>
   import appState from '@/components/AppState'
 
+  function byCount(a, b) {
+    return b.count - a.count
+  }
+
   export default {
     name: 'Controls',
     data() {
@@ -56,13 +60,13 @@
     },
     computed: {
       withinMovements: function() {
-        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="within")
+        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="within").sort(byCount)
       },
       fromMovements: function() {
-        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="from")
+        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="from").sort(byCount)
       },
       toMovements: function() {
-        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="to")
+        return this.appState.highlightedRegionMovementData.slice().filter(m => m.direction=="to").sort(byCount)
       }
     },
     mounted() {
