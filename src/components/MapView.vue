@@ -209,6 +209,10 @@
         })
       })
 
+      this.$root.$on('removeHighlight', function () {
+        self.unhighlight();
+      })
+
       this.$root.$on('regionClicked', function (data) {
         // See if this is an "unclick", i.e. click on an already-selected region
         let isUnclick = false

@@ -269,9 +269,7 @@ function getHopMesh(row, toEastingField, toNorthingField, transportMode, materia
 
   let op = to.y - from.y;
   let ad = to.x - from.x;
-  let oldTheta = Math.atan(op / ad);
   let theta = Math.atan2(op , ad);
-  console.log("thetas", {oldTheta, theta})
   let hy = Math.sqrt(Math.pow(op, 2) + Math.pow(ad, 2))
   let radius = hy / 2
   let tubeDiameter = row.data[transportMode] / 5000;

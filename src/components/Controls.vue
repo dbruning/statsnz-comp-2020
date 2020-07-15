@@ -3,17 +3,19 @@
         <div class="heading-and-info">
             <h3 class="heading-name">CommuterView</h3>
             <a href="#" @click="showInfoModal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-square" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z"/>
-                        <line x1="12" y1="8" x2="12.01" y2="8" />
-                        <rect x="4" y="4" width="16" height="16" rx="2" />
-                        <polyline points="11 12 12 12 12 16 13 16" />
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-square" width="24"
+                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <polyline points="11 12 12 12 12 16 13 16"/>
+                </svg>
             </a>
         </div>
         <h5>2018 Census data</h5>
 
-        <div v-show="!appState.isLoadingVisualisation">
+        <div v-show="!appState.isLoadingVisualisation" class="form-groups">
 
             <b-form-group label="Dataset:">
                 <b-form-radio-group buttons button-variant="outline-primary" size="sm" class="full-width">
@@ -75,11 +77,14 @@
         </div>
 
         <b-modal id="info-modal" title="There and back again." size="lg">
-            <p >
+            <p>
                 This app was developed for the StatsNZ "There and back again"
-                <a href="https://www.stats.govt.nz/2018-census/there-and-back-again-data-visualisation-competition/"> data visualisation competition</a>.
-                It visualises data from the 2018 NZ Census (travel for work & education) by overlaying selected data as "hops" on a map.
-                Each hop's thickness is proportional to the number of people travelling between the areas at either end of the "hop".
+                <a href="https://www.stats.govt.nz/2018-census/there-and-back-again-data-visualisation-competition/">
+                    data visualisation competition</a>.
+                It visualises data from the 2018 NZ Census (travel for work & education) by overlaying selected data as
+                "hops" on a map.
+                Each hop's thickness is proportional to the number of people travelling between the areas at either end
+                of the "hop".
             </p>
             <p>All rights reserved, Darren Bruning, 2020</p>
             <p>Contact: <a href="mailto:darren@bruning.net.nz">darren@bruning.net.nz</a></p>
@@ -87,17 +92,20 @@
             <h5>Data sources</h5>
             <ul>
                 <li>
-                    <a href="https://datafinder.stats.govt.nz/data/category/census/2018/commuter-view/">Work & Education datasets</a> are from statsNZ
+                    <a href="https://datafinder.stats.govt.nz/data/category/census/2018/commuter-view/">Work & Education
+                        datasets</a> are from statsNZ
                 </li>
                 <li>
-                    New Zealand map is <a href="https://datafinder.stats.govt.nz/layer/92212-statistical-area-2-2018-generalised/">Statistical Area 2 2018 Generalised</a>
+                    New Zealand map is <a
+                        href="https://datafinder.stats.govt.nz/layer/92212-statistical-area-2-2018-generalised/">Statistical
+                    Area 2 2018 Generalised</a>
                     (also from statsNZ) but has been simplified for performance with <a href="https://mapshaper.org">mapshaper.org</a>
                 </li>
             </ul>
             <h5>Major components</h5>
             <ul>
-                <li> <a href="https://threejs.org/">Three.js</a> for visualisation (map and hops)</li>
-                <li> <a href="https://www.papaparse.com/">Papa Parse</a> for download & parsing of csv data</li>
+                <li><a href="https://threejs.org/">Three.js</a> for visualisation (map and hops)</li>
+                <li><a href="https://www.papaparse.com/">Papa Parse</a> for download & parsing of csv data</li>
                 <li>
                     <a href="https://github.com/topojson/topojson-client">topojson-client</a>
                     and <a href="https://d3js.org/">d3.js</a> for processing of map data
@@ -186,9 +194,15 @@
         flex-direction: row;
         justify-content: space-between;
     }
+
+    .heading-and-info h3 {
+        margin-bottom: 5px;
+    }
+
     .heading-name {
         display: inline;
     }
+
     .icon-tabler-info-square {
         margin-top: 6px;
     }
@@ -197,6 +211,13 @@
         width: 100%;
     }
 
+    /*Tighten up the labels above form controls*/
+    fieldset legend.col-form-label{
+        padding-bottom: 3px;
+    }
+    .form-groups {
+       margin-top: 13px;
+    }
     .progress-line {
         display: flex;
         flex-direction: row;
@@ -207,7 +228,6 @@
         background-color: black;
         color: #42b983;
         border-color: #42b983;
-
     }
 </style>
 

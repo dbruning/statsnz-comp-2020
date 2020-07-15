@@ -5,6 +5,10 @@ $body-color: #111;
 
 $primary: #42b983;
 
+#app a {
+  text-decoration-line: underline;
+}
+
 
 @import '~bootstrap';
 @import '~bootstrap-vue';

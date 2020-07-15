@@ -1,7 +1,7 @@
 <template>
-    <div v-if="appState.highlightedRegionName.length">
+    <div v-if="appState.highlightedRegionName.length" class="region-detail">
         {{appState.highlightedRegionName}}:
-        <table>
+        <table class="table-condensed">
             <tr v-for="(movement, index) in withinMovements" :key="index">
                 <td class="name">
                     {{movement.direction}} {{movement.name}}
@@ -11,7 +11,7 @@
                 </td>
             </tr>
         </table>
-        <table>
+        <table class="table-condensed">
             <tr v-for="(movement, index) in fromMovements" :key="index">
                 <td class="name">
                     {{movement.direction}} {{movement.name}}
@@ -21,7 +21,7 @@
                 </td>
             </tr>
         </table>
-        <table>
+        <table class="table-condensed">
             <tr v-for="(movement, index) in toMovements" :key="index">
                 <td class="name">
                     {{movement.direction}} {{movement.name}}
@@ -31,6 +31,7 @@
                 </td>
             </tr>
         </table>
+        <a href="#" @click="removeHighlight">remove highlight</a>
         <!--{{appState.highlightedRegionMovementData}}-->
         <!--{{sortedMovements}}-->
 
@@ -54,9 +55,9 @@
     created() {
     },
     methods: {
-      // loadClicked() {
-      //   this.$root.$emit('load')
-      // }
+      removeHighlight() {
+        this.$root.$emit('removeHighlight')
+      }
     },
     computed: {
       withinMovements: function() {
@@ -81,6 +82,10 @@
 </script>
 
 <style scoped>
+    .region-detail {
+        margin-top: 1em;
+    }
+
     table {
         margin: 0.5em;
         width: 100%;
