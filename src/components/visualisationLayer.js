@@ -18,7 +18,7 @@ let hopMaterial = new Three.MeshPhongMaterial({color: 0xffff00});
 // (they're spinning anyway, so that should help too, and also listed in a table on the side so color is not
 //  the only distinguisher here)
 let inHopMaterial = new Three.MeshPhongMaterial({color: 0xff4d4f}); // red
-let outHopMaterial = new Three.MeshPhongMaterial({color: 0x4309e3}); // blue
+let outHopMaterial = new Three.MeshPhongMaterial({color: 0x47d8fc}); // blue
 
 function getSettingsForDataset(dataset) {
   return {

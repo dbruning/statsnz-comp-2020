@@ -165,6 +165,23 @@
         for (let m of this.visualisationData) {
           m.visible = isVisible
         }
+      },
+      unhighlight() {
+        let self = this
+        // Remove any previously-highlighted polygon & hops
+        if (self.highlightedRegionPolygon) self.scene.remove(self.highlightedRegionPolygon)
+        self.highlightedRegionPolygon = null
+        for (let hop of self.highlightedRegionHops) {
+          self.scene.remove(hop)
+        }
+        self.highlightedRegionHops.length = 0;
+
+        // Unset the highlighted region name
+        self.appState.highlightedRegionName = ""
+
+        // Show normal country-wide hops
+        self.setVisualisationVisibility(true)
+
       }
     },
     mounted() {
@@ -174,6 +191,8 @@
 
       // Get visualisation data when we know which dataset to load
       this.$root.$on("load", function () {
+        self.unhighlight()
+
         // Remove any existing visualisation data
         if (self.visualisationData && self.visualisationData.length) {
           for (let vd of self.visualisationData) {
@@ -190,8 +209,8 @@
         })
       })
 
-
       this.$root.$on('regionClicked', function (data) {
+        // See if this is an "unclick", i.e. click on an already-selected region
         let isUnclick = false
         if (self.highlightedRegionPolygon != null) {
           if (self.highlightedRegionPolygon.userData.SA22018__1 == data.SA22018__1) {
@@ -199,20 +218,14 @@
           }
         }
 
-        // Remove any previously-highlighted polygon & hops
-        if (self.highlightedRegionPolygon) self.scene.remove(self.highlightedRegionPolygon)
-        self.highlightedRegionPolygon = null
-        for (let hop of self.highlightedRegionHops) {
-          self.scene.remove(hop)
-        }
-        self.highlightedRegionHops.length = 0;
-
-        // Hide country-wide hops
-        self.setVisualisationVisibility(isUnclick)
-        self.appState.highlightedRegionName = ""
+        // Always unhighlight, we'll potentially apply highlight again later
+        self.unhighlight();
 
         // If it was an unclick, we're done
         if (isUnclick) return;
+
+        // Not an unclick - hide the normal countrywide hops
+        self.setVisualisationVisibility(false)
 
         // Run through our data to find rows (& make hoops) relating to that region
         let regionName = data.SA22018__1

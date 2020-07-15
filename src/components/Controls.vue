@@ -141,7 +141,6 @@
       },
       showInfoModal() {
         this.$bvModal.show('info-modal')
-
       }
     },
     computed: {
