@@ -42,6 +42,7 @@
 
   export default {
     name: 'App',
+    title: 'There and back again',
     components: {
       MapView, Controls,
       // PerfStats,
