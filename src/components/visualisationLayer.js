@@ -34,9 +34,7 @@ function getFullTransportModeField(fieldName, appState) {
 
 }
 
-export function addVisualisationData(scene, appState, progressCallback) {
-  let result = []
-
+export function addVisualisationData(scene, appState, addedMeshes, progressCallback) {
   let mergedGeometry = new Three.Geometry;
 
   let countMerged = 0;
@@ -121,7 +119,7 @@ export function addVisualisationData(scene, appState, progressCallback) {
 
       let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
       scene.add(mesh);
-      result.push(mesh)
+      addedMeshes.push(mesh)
 
       mergedGeometry = new Three.Geometry;
       countMerged = 0;
@@ -137,7 +135,7 @@ export function addVisualisationData(scene, appState, progressCallback) {
     // Add the final mesh to the scene & results
     let mesh = new Three.Mesh(mergedGeometry, hopMaterial);
     scene.add(mesh);
-    result.push(mesh)
+    addedMeshes.push(mesh)
 
     appState.progressTask = ""
 
@@ -202,8 +200,6 @@ export function addVisualisationData(scene, appState, progressCallback) {
       }
     })
   }
-
-  return result;
 }
 
 export function getRegionData(regionName, appState, areaPolygons) {

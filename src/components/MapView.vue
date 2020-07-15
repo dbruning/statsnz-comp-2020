@@ -171,9 +171,10 @@
             self.scene.remove(vd);
           }
         }
+        self.visualisationData.length = 0;
 
         // Add new visualisation data
-        self.visualisationData = addVisualisationData(self.scene, self.appState, function() {
+        addVisualisationData(self.scene, self.appState, self.visualisationData, function() {
           // Render on each progress callback
           // console.log("progressCallback, going to render")
           self.renderer.render(self.scene, self.camera);
